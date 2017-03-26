@@ -21,14 +21,14 @@ import java.util.*;
 /**
  * @author Dmitry Ovchinnikov
  */
-public final class LinkedTypedMIMap<K extends Key<K, V>, V> implements TypedMIMap<K, V> {
+public final class LinkedTypedIdentityMIMap<K extends Key<K, V>, V> implements TypedMIMap<K, V> {
 
     private LinkedEntry<K, V> entry;
 
-    public LinkedTypedMIMap() {
+    public LinkedTypedIdentityMIMap() {
     }
 
-    public LinkedTypedMIMap(TypedIIMap<K, V> map) {
+    public LinkedTypedIdentityMIMap(TypedIIMap<K, V> map) {
         map.entries().forEach(e -> put(e.getKey(), e.getValue()));
     }
 
@@ -60,7 +60,7 @@ public final class LinkedTypedMIMap<K extends Key<K, V>, V> implements TypedMIMa
                 @Override
                 public boolean contains(Object o) {
                     for (LinkedEntry<K, ?> en = e; en != null; en = en.next) {
-                        if (en.key.equals(o)) {
+                        if (en.key == o) {
                             return true;
                         }
                     }
@@ -69,7 +69,7 @@ public final class LinkedTypedMIMap<K extends Key<K, V>, V> implements TypedMIMa
 
                 @Override
                 public int size() {
-                    return LinkedTypedMIMap.this.size();
+                    return LinkedTypedIdentityMIMap.this.size();
                 }
             };
         }
@@ -112,7 +112,7 @@ public final class LinkedTypedMIMap<K extends Key<K, V>, V> implements TypedMIMa
 
                 @Override
                 public int size() {
-                    return LinkedTypedMIMap.this.size();
+                    return LinkedTypedIdentityMIMap.this.size();
                 }
             };
         }
@@ -121,7 +121,7 @@ public final class LinkedTypedMIMap<K extends Key<K, V>, V> implements TypedMIMa
     @Override
     public boolean containsKey(@Nonnull K key) {
         for (LinkedEntry<K, ?> en = entry; en != null; en = en.next) {
-            if (en.key.equals(key)) {
+            if (en.key == key) {
                 return true;
             }
         }
@@ -156,7 +156,7 @@ public final class LinkedTypedMIMap<K extends Key<K, V>, V> implements TypedMIMa
     @Override
     public <KEY extends Key<KEY, VAL>, VAL extends V> VAL get(@Nonnull KEY key) {
         for (LinkedEntry<K, V> e = entry; e != null; e = e.next) {
-            if (e.key.equals(key)) {
+            if (e.key == key) {
                 return (VAL) e.value;
             }
         }
@@ -178,7 +178,7 @@ public final class LinkedTypedMIMap<K extends Key<K, V>, V> implements TypedMIMa
 
                 @Override
                 public int size() {
-                    return LinkedTypedMIMap.this.size();
+                    return LinkedTypedIdentityMIMap.this.size();
                 }
             };
         }
@@ -189,12 +189,12 @@ public final class LinkedTypedMIMap<K extends Key<K, V>, V> implements TypedMIMa
     public <KEY extends Key<KEY, VAL>, VAL extends V> VAL put(KEY key, VAL value) {
         LinkedEntry<K, V> prev = entry;
         if (prev != null) {
-            if (prev.key.equals(key)) {
+            if (prev.key == key) {
                 entry = new LinkedEntry<>(prev.key, value, prev.next);
                 return (VAL) prev.value;
             }
             for (LinkedEntry<K, V> e = prev.next; e != null; prev = e, e = e.next) {
-                if (e.key.equals(key)) {
+                if (e.key == key) {
                     prev.next = new LinkedEntry<>(e.key, value, e.next);
                     return (VAL) e.value;
                 }

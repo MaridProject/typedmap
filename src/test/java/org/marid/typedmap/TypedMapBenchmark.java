@@ -30,6 +30,7 @@
 
 package org.marid.typedmap;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import javafx.util.Pair;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
@@ -43,24 +44,24 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-import static org.marid.typedmap.TypedMapPutBenchmark.COUNT;
+import static java.util.Collections.synchronizedMap;
+import static org.marid.typedmap.TypedMapBenchmark.COUNT;
 
 /**
  * @author Dmitry Ovchinnikov
  */
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @BenchmarkMode(Mode.AverageTime)
-@Threads(4)
 @Warmup(iterations = 5)
 @Measurement(iterations = 5)
 @OperationsPerInvocation(COUNT)
 @Fork(value = 1, jvmArgs = {"-XX:+UseG1GC"})
-public class TypedMapPutBenchmark {
+public class TypedMapBenchmark {
 
     static final int COUNT = 100_000;
 
     @Benchmark
-    public void linkedTypedMI(ThreadState state, Blackhole blackhole) {
+    public void put(ThreadState state, Blackhole blackhole) {
         for (int i = 0; i < COUNT; i++) {
             final TypedMIMap<TestKey<Integer>, Integer> map = state.supplier.get();
             for (final Pair<TestKey<Integer>, Integer> pair : state.pairs) {
@@ -70,18 +71,30 @@ public class TypedMapPutBenchmark {
         }
     }
 
+    @Benchmark
+    public void get(ThreadState state, Blackhole blackhole) {
+        for (int i = 0; i < COUNT; i++) {
+            final TypedMIMap<TestKey<Integer>, Integer> map = state.map;
+            for (final Pair<TestKey<Integer>, Integer> pair : state.pairs) {
+                blackhole.consume(map.get(pair.getKey()));
+            }
+        }
+    }
+
     @State(Scope.Benchmark)
     public static class ThreadState {
 
         private final List<Pair<TestKey<Integer>, Integer>> pairs = new ArrayList<>();
 
-        @Param({"3", "18", "36", "70", "180"})
+        @Param({"5", "54", "180"})
         private int size;
 
-        @Param({"linkedMI", "typedMM"})
+        @Param({"linkedMI", "linkedIdMI", "hash", "fu", "fuSync"})
         private String type;
 
         private Supplier<TypedMIMap<TestKey<Integer>, Integer>> supplier;
+
+        private TypedMIMap<TestKey<Integer>, Integer> map;
 
         @Setup
         public void init() {
@@ -92,16 +105,33 @@ public class TypedMapPutBenchmark {
                 case "linkedMI":
                     supplier = LinkedTypedMIMap::new;
                     break;
-                case "typedMM":
+                case "linkedIdMI":
+                    supplier = LinkedTypedIdentityMIMap::new;
+                    break;
+                case "hash":
                     supplier = () -> new TypedForwardingMMMap<>(new HashMap<TestKey<Integer>, Integer>(size));
                     break;
+                case "fu":
+                    supplier = () -> new TypedForwardingMMMap<>(
+                            new Object2ObjectOpenHashMap<TestKey<Integer>, Integer>(size)
+                    );
+                    break;
+                case "fuSync":
+                    supplier = () -> new TypedForwardingMMMap<>(
+                            synchronizedMap(new Object2ObjectOpenHashMap<TestKey<Integer>, Integer>(size))
+                    );
+                    break;
+                default:
+                    throw new IllegalArgumentException(type);
             }
+            map = supplier.get();
+            pairs.forEach(p -> map.put(p.getKey(), p.getValue()));
         }
     }
 
     public static void main(String... args) throws Exception {
         new Runner(new OptionsBuilder()
-                .include(TypedMapPutBenchmark.class.getSimpleName())
+                .include(TypedMapBenchmark.class.getSimpleName())
                 .addProfiler(GCProfiler.class)
                 .build()
         ).run();

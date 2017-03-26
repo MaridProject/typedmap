@@ -18,9 +18,6 @@ package org.marid.typedmap;
 /**
  * @author Dmitry Ovchinnikov
  */
-public interface Key<K extends Key<K, T>, T> {
+public interface TypedMMMap<K extends Key<K, V>, V> extends TypedMIMap<K, V>, TypedIMMap<K, V> {
 
-    default T getDefault() {
-        return null;
-    }
 }

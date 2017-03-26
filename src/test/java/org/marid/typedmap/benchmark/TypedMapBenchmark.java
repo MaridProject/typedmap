@@ -13,14 +13,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap;
+package org.marid.typedmap.benchmark;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-public interface Key<K extends Key<K, T>, T> {
-
-    default T getDefault() {
-        return null;
-    }
+public class TypedMapBenchmark {
 }

@@ -15,34 +15,18 @@
 
 package org.marid.typedmap;
 
-import java.util.HashMap;
-import java.util.function.Function;
+import java.util.Collection;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedHashMap<K extends Key<?>> extends HashMap<K, Object> implements TypedMap<K> {
+public interface TypedIMMap<K extends Key<K, V>, V> extends TypedIIMap<K, V> {
 
     @Override
-    public boolean containsKey(K key) {
-        return super.containsKey(key);
-    }
+    Collection<? extends TypedIMMap.Entry<K, V>> entries();
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public <V> V get(K key) {
-        return (V) super.get(key);
-    }
+    interface Entry<K extends Key<K, V>, V> extends TypedIIMap.Entry<K, V> {
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public <V> V getOrDefault(K key, V defaultValue) {
-        return (V) super.getOrDefault(key, defaultValue);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <V> V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) {
-        return (V) super.computeIfAbsent(key, mappingFunction);
+        V setValue(V value);
     }
 }

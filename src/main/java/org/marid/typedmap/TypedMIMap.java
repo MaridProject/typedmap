@@ -15,30 +15,10 @@
 
 package org.marid.typedmap;
 
-import java.util.Collection;
-import java.util.Set;
-import java.util.function.Function;
-
 /**
  * @author Dmitry Ovchinnikov
  */
-public interface TypedMap<K extends Key<?>> {
+public interface TypedMIMap<K extends Key<K, V>, V> extends TypedIIMap<K, V> {
 
-    Set<K> keySet();
-
-    Collection<?> values();
-
-    boolean containsKey(K key);
-
-    boolean containsValue(Object value);
-
-    int size();
-
-    boolean isEmpty();
-
-    <V> V get(K key);
-
-    <V> V getOrDefault(K key, V defaultValue);
-
-    <V> V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction);
+    <KEY extends Key<KEY, VAL>, VAL extends V> VAL put(KEY key, VAL value);
 }

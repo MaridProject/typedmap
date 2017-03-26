@@ -15,12 +15,39 @@
 
 package org.marid.typedmap;
 
+import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.Set;
+
 /**
  * @author Dmitry Ovchinnikov
  */
-public interface Key<K extends Key<K, T>, T> {
+public interface TypedIIMap<K extends Key<K, V>, V> {
 
-    default T getDefault() {
-        return null;
+    @Nonnull
+    Set<? extends K> keySet();
+
+    @Nonnull
+    Collection<? extends V> values();
+
+    boolean containsKey(K key);
+
+    boolean containsValue(Object value);
+
+    int size();
+
+    boolean isEmpty();
+
+    <KEY extends Key<KEY, VAL>, VAL extends V> VAL get(@Nonnull KEY key);
+
+    Collection<? extends Entry<K, V>> entries();
+
+    interface Entry<K extends Key<K, V>, V> {
+
+        @Nonnull
+        K getKey();
+
+        @Nonnull
+        V getValue();
     }
 }

@@ -18,9 +18,5 @@ package org.marid.typedmap;
 /**
  * @author Dmitry Ovchinnikov
  */
-public interface Key<K extends Key<K, T>, T> {
-
-    default T getDefault() {
-        return null;
-    }
+public class LinkedTypedMIMapTest {
 }

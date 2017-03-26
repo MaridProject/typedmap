@@ -36,26 +36,54 @@ import java.util.*;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedHashMMMap<K extends Key<K, V>, V> extends HashMap<K, V> implements TypedMMMap<K,V> {
+public class TypedForwardingMMMap<K extends Key<K, V>, V> implements TypedMMMap<K,V> {
 
-    public TypedHashMMMap(int initialCapacity, float loadFactor) {
-        super(initialCapacity, loadFactor);
+    private final Map<K, V> delegate;
+
+    public TypedForwardingMMMap(Map<K, V> delegate) {
+        this.delegate = delegate;
     }
 
-    public TypedHashMMMap(TypedIIMap<K, V> map, float loadFactor) {
-        super(map.size(), loadFactor);
-        map.entries().forEach(e -> super.put(e.getKey(), e.getValue()));
+    public TypedForwardingMMMap() {
+        this(new HashMap<>());
+    }
+
+    @Nonnull
+    @Override
+    public Set<? extends K> keySet() {
+        return delegate.keySet();
+    }
+
+    @Nonnull
+    @Override
+    public Collection<? extends V> values() {
+        return delegate.values();
     }
 
     @Override
     public boolean containsKey(K key) {
-        return super.containsKey(key);
+        return delegate.containsKey(key);
+    }
+
+    @Override
+    public boolean containsValue(V value) {
+        return delegate.containsValue(value);
+    }
+
+    @Override
+    public int size() {
+        return delegate.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return delegate.isEmpty();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <KEY extends Key<KEY, VAL>, VAL extends V> VAL get(@Nonnull KEY key) {
-        return (VAL) super.getOrDefault(key, key.getDefault());
+        return (VAL) delegate.getOrDefault(key, key.getDefault());
     }
 
     @Override
@@ -64,7 +92,7 @@ public class TypedHashMMMap<K extends Key<K, V>, V> extends HashMap<K, V> implem
             @Nonnull
             @Override
             public Iterator<TypedIMMap.Entry<K, V>> iterator() {
-                final Iterator<Map.Entry<K, V>> mapEntries = entrySet().iterator();
+                final Iterator<Map.Entry<K, V>> mapEntries = delegate.entrySet().iterator();
                 return new Iterator<TypedIMMap.Entry<K, V>>() {
                     @Override
                     public boolean hasNext() {
@@ -98,7 +126,7 @@ public class TypedHashMMMap<K extends Key<K, V>, V> extends HashMap<K, V> implem
 
             @Override
             public int size() {
-                return TypedHashMMMap.this.size();
+                return TypedForwardingMMMap.this.size();
             }
         };
     }
@@ -106,6 +134,6 @@ public class TypedHashMMMap<K extends Key<K, V>, V> extends HashMap<K, V> implem
     @SuppressWarnings("unchecked")
     @Override
     public <KEY extends Key<KEY, VAL>, VAL extends V> VAL put(KEY key, VAL value) {
-        return (VAL) super.put((K) key, value);
+        return (VAL) delegate.put((K) key, value);
     }
 }

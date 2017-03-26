@@ -32,7 +32,7 @@ public interface TypedIIMap<K extends Key<K, V>, V> {
 
     boolean containsKey(K key);
 
-    boolean containsValue(Object value);
+    boolean containsValue(V value);
 
     int size();
 

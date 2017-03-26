@@ -15,12 +15,13 @@
 
 package org.marid.typedmap;
 
+import javax.annotation.Nullable;
+
 /**
  * @author Dmitry Ovchinnikov
  */
 public interface Key<K extends Key<K, T>, T> {
 
-    default T getDefault() {
-        return null;
-    }
+    @Nullable
+    T getDefault();
 }

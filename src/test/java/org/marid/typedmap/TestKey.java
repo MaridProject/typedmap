@@ -15,8 +15,26 @@
 
 package org.marid.typedmap;
 
+import javax.annotation.Nullable;
+
 /**
  * @author Dmitry Ovchinnikov
  */
-public class LinkedTypedMIMapTest {
+public class TestKey<V> implements Key<TestKey<V>, V> {
+
+    private final V defaultValue;
+
+    public TestKey(V defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
+    public TestKey() {
+        this(null);
+    }
+
+    @Nullable
+    @Override
+    public V getDefault() {
+        return defaultValue;
+    }
 }

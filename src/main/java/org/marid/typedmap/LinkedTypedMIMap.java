@@ -130,7 +130,7 @@ public final class LinkedTypedMIMap<K extends Key<K, V>, V> implements TypedMIMa
     }
 
     @Override
-    public boolean containsValue(@Nonnull Object value) {
+    public boolean containsValue(@Nonnull V value) {
         for (LinkedEntry<K, ?> en = entry; en != null; en = en.next) {
             if (en.value.equals(value)) {
                 return true;
@@ -200,6 +200,9 @@ public final class LinkedTypedMIMap<K extends Key<K, V>, V> implements TypedMIMa
                 return (VAL) e.value;
             }
         }
+        final LinkedEntry<K, V> newEntry = new LinkedEntry<>((K) key, value);
+        newEntry.next = entry;
+        entry = newEntry;
         return null;
     }
 

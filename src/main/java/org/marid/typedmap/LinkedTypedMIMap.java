@@ -188,21 +188,20 @@ public final class LinkedTypedMIMap<K extends Key<K, V>, V> implements TypedMIMa
     @SuppressWarnings("unchecked")
     @Override
     public <KEY extends Key<KEY, VAL>, VAL extends V> VAL put(KEY key, VAL value) {
-        for (LinkedEntry<K, V> prev = null, e = entry; e != null; prev = e, e = e.next) {
-            if (e.key.equals(key)) {
-                final LinkedEntry<K, V> newEntry = new LinkedEntry<>(e.key, value);
-                newEntry.next = e.next;
-                if (prev == null) {
-                    entry = newEntry;
-                } else {
-                    prev.next = newEntry;
+        LinkedEntry<K, V> prev = entry;
+        if (prev != null) {
+            if (prev.key.equals(key)) {
+                entry = new LinkedEntry<>(prev.key, value, prev.next);
+                return (VAL) prev.value;
+            }
+            for (LinkedEntry<K, V> e = prev.next; e != null; prev = e, e = e.next) {
+                if (e.key.equals(key)) {
+                    prev.next = new LinkedEntry<>(e.key, value, e.next);
+                    return (VAL) e.value;
                 }
-                return (VAL) e.value;
             }
         }
-        final LinkedEntry<K, V> newEntry = new LinkedEntry<>((K) key, value);
-        newEntry.next = entry;
-        entry = newEntry;
+        entry = new LinkedEntry<>((K) key, value, entry);
         return null;
     }
 
@@ -228,33 +227,34 @@ public final class LinkedTypedMIMap<K extends Key<K, V>, V> implements TypedMIMa
             }
         };
     }
+}
 
-    private static final class LinkedEntry<K extends Key<K, V>, V> implements Entry<K, V> {
+final class LinkedEntry<K extends Key<K, V>, V> implements TypedIIMap.Entry<K, V> {
 
-        @Nonnull
-        private final K key;
+    @Nonnull
+    final K key;
 
-        @Nonnull
-        private final V value;
+    @Nonnull
+    final V value;
 
-        @Nullable
-        private LinkedEntry<K, V> next;
+    @Nullable
+    LinkedEntry<K, V> next;
 
-        private LinkedEntry(@Nonnull K key, @Nonnull V value) {
-            this.key = key;
-            this.value = value;
-        }
+    LinkedEntry(@Nonnull K key, @Nonnull V value, @Nullable LinkedEntry<K, V> next) {
+        this.key = key;
+        this.value = value;
+        this.next = next;
+    }
 
-        @Nonnull
-        @Override
-        public K getKey() {
-            return key;
-        }
+    @Nonnull
+    @Override
+    public K getKey() {
+        return key;
+    }
 
-        @Nonnull
-        @Override
-        public V getValue() {
-            return value;
-        }
+    @Nonnull
+    @Override
+    public V getValue() {
+        return value;
     }
 }

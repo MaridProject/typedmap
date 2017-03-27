@@ -15,17 +15,20 @@
 
 package org.marid.typedmap;
 
-import java.util.Collection;
+import java.util.function.Consumer;
 
 /**
  * @author Dmitry Ovchinnikov
  */
 public interface TypedIMMap<K extends Key<K, V>, V> extends TypedIIMap<K, V> {
 
-    @Override
-    Collection<? extends TypedIMMap.Entry<K, V>> entries();
+    void forEach(Consumer<Entry<K, V>> consumer);
 
-    interface Entry<K extends Key<K, V>, V> extends TypedIIMap.Entry<K, V> {
+    interface Entry<K extends Key<K, V>, V> {
+
+        K getKey();
+
+        V getValue();
 
         V setValue(V value);
     }

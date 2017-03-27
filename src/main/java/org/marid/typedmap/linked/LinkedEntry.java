@@ -35,24 +35,26 @@ import org.marid.typedmap.TypedIMMap;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-final class LinkedEntry<K extends Key<K, V>, V> implements TypedIMMap.Entry<K, V>, Iterable<LinkedEntry<K, V>> {
+final class LinkedEntry<K extends Key<K, V>, V> implements TypedIMMap.Entry<K, V> {
+
+    private static final AtomicReferenceFieldUpdater<LinkedEntry, Object> F =
+            AtomicReferenceFieldUpdater.newUpdater(LinkedEntry.class, Object.class, "value");
+
+    @Nullable
+    volatile LinkedEntry<K, V> next;
 
     @Nonnull
     final K key;
 
     @Nonnull
-    V value;
+    volatile V value;
 
-    @Nullable
-    LinkedEntry<K, V> next;
-
-    LinkedEntry(@Nonnull K key, @Nonnull V value, @Nullable LinkedEntry<K, V> next) {
+    LinkedEntry(@Nullable LinkedEntry<K, V> next, @Nonnull K key, @Nonnull V value) {
         this.key = key;
         this.value = value;
         this.next = next;
@@ -70,35 +72,9 @@ final class LinkedEntry<K extends Key<K, V>, V> implements TypedIMMap.Entry<K, V
         return value;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public V setValue(V value) {
-        final V old = this.value;
-        this.value = value;
-        return old;
-    }
-
-    @Nonnull
-    @Override
-    public Iterator<LinkedEntry<K, V>> iterator() {
-        return new Iterator<LinkedEntry<K, V>>() {
-
-            private LinkedEntry<K, V> e = LinkedEntry.this;
-
-            @Override
-            public boolean hasNext() {
-                return e != null;
-            }
-
-            @Override
-            public LinkedEntry<K, V> next() {
-                final LinkedEntry<K, V> prev = e;
-                if (prev == null) {
-                    throw new NoSuchElementException();
-                } else {
-                    e = e.next;
-                    return prev;
-                }
-            }
-        };
+        return (V) F.getAndSet(this, value);
     }
 }

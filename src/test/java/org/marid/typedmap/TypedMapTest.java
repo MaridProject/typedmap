@@ -16,16 +16,12 @@
 package org.marid.typedmap;
 
 import org.apache.commons.math3.util.Pair;
-import org.marid.typedmap.TypedIIMap.Entry;
 import org.marid.typedmap.linked.TypedLinkedMMMap;
 import org.marid.typedmap.wrapped.TypedWrappedMMMap;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -38,7 +34,7 @@ import static org.testng.Assert.assertEquals;
  */
 public class TypedMapTest {
 
-    private static final int ENTRY_COUNT = 10;
+    private static final int ENTRY_COUNT = 77;
     private static final int ENTRY_SET_COUNT = 10;
     private static final List<Supplier<TypedMIMap<TestKey<Integer>, Integer>>> MAP_SUPPLIERS = Arrays.asList(
             TypedLinkedMMMap::new,
@@ -74,8 +70,8 @@ public class TypedMapTest {
 
         pairs.forEach(p -> map.put(p.getKey(), p.getValue()));
 
-        final Map<TestKey<Integer>, Integer> actualMap = map.entries().stream()
-                .collect(toMap(Entry::getKey, Entry::getValue));
+        final Map<TestKey<Integer>, Integer> actualMap = new HashMap<>();
+        map.forEach(actualMap::put);
 
         assertEquals(actualMap, expectedMap);
     }

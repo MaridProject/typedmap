@@ -32,110 +32,28 @@ package org.marid.typedmap.linked;
 
 import org.marid.typedmap.Key;
 import org.marid.typedmap.TypedIIMap;
-import org.marid.typedmap.TypedIMMap;
 import org.marid.typedmap.TypedMMMap;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * @author Dmitry Ovchinnikov
  */
 public final class TypedLinkedMMMap<K extends Key<K, V>, V> implements TypedMMMap<K, V> {
 
-    private LinkedEntry<K, V> entry;
+    private static final AtomicReferenceFieldUpdater<TypedLinkedMMMap, LinkedEntry> F =
+            AtomicReferenceFieldUpdater.newUpdater(TypedLinkedMMMap.class, LinkedEntry.class, "entry");
+
+    private volatile LinkedEntry<K, V> entry;
 
     public TypedLinkedMMMap() {
     }
 
     public TypedLinkedMMMap(TypedIIMap<K, V> map) {
-        map.entries().forEach(e -> put(e.getKey(), e.getValue()));
-    }
-
-    @Nonnull
-    @Override
-    public Set<? extends K> keySet() {
-        final LinkedEntry<K, V> e = entry;
-        if (e == null) {
-            return Collections.emptySet();
-        } else {
-            return new AbstractSet<K>() {
-                @Nonnull
-                @Override
-                public Iterator<K> iterator() {
-                    final Iterator<LinkedEntry<K, V>> iterator = e.iterator();
-                    return new Iterator<K>() {
-                        @Override
-                        public boolean hasNext() {
-                            return iterator.hasNext();
-                        }
-
-                        @Override
-                        public K next() {
-                            return iterator.next().key;
-                        }
-                    };
-                }
-
-                @Override
-                public boolean contains(Object o) {
-                    for (LinkedEntry<K, ?> en = e; en != null; en = en.next) {
-                        if (en.key == o) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-
-                @Override
-                public int size() {
-                    return TypedLinkedMMMap.this.size();
-                }
-            };
-        }
-    }
-
-    @Nonnull
-    @Override
-    public Collection<? extends V> values() {
-        final LinkedEntry<K, V> e = entry;
-        if (e == null) {
-            return Collections.emptySet();
-        } else {
-            return new AbstractSet<V>() {
-                @Nonnull
-                @Override
-                public Iterator<V> iterator() {
-                    final Iterator<LinkedEntry<K, V>> iterator = e.iterator();
-                    return new Iterator<V>() {
-                        @Override
-                        public boolean hasNext() {
-                            return iterator.hasNext();
-                        }
-
-                        @Override
-                        public V next() {
-                            return iterator.next().value;
-                        }
-                    };
-                }
-
-                @Override
-                public boolean contains(Object o) {
-                    for (LinkedEntry<K, ?> en = e; en != null; en = en.next) {
-                        if (en.value.equals(o)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-
-                @Override
-                public int size() {
-                    return TypedLinkedMMMap.this.size();
-                }
-            };
-        }
+        map.forEach(this::put);
     }
 
     @Override
@@ -184,23 +102,9 @@ public final class TypedLinkedMMMap<K extends Key<K, V>, V> implements TypedMMMa
     }
 
     @Override
-    public Collection<? extends TypedIMMap.Entry<K, V>> entries() {
-        final LinkedEntry<K, V> e = entry;
-        if (e == null) {
-            return Collections.emptySet();
-        } else {
-            return new AbstractCollection<LinkedEntry<K, V>>() {
-                @Nonnull
-                @Override
-                public Iterator<LinkedEntry<K, V>> iterator() {
-                    return e.iterator();
-                }
-
-                @Override
-                public int size() {
-                    return TypedLinkedMMMap.this.size();
-                }
-            };
+    public void forEach(BiConsumer<K, V> consumer) {
+        for (LinkedEntry<K, V> e = entry; e != null; e = e.next) {
+            consumer.accept(e.key, e.value);
         }
     }
 
@@ -212,7 +116,14 @@ public final class TypedLinkedMMMap<K extends Key<K, V>, V> implements TypedMMMa
                 return (VAL) e.setValue(value);
             }
         }
-        entry = new LinkedEntry<>((K) key, value, entry);
+        F.updateAndGet(this, e -> new LinkedEntry(e, key, value));
         return null;
+    }
+
+    @Override
+    public void forEach(Consumer<Entry<K, V>> consumer) {
+        for (LinkedEntry<K, V> e = entry; e != null; e = e.next) {
+            consumer.accept(e);
+        }
     }
 }

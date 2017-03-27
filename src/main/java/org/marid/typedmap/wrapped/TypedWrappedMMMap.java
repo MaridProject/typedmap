@@ -46,11 +46,13 @@
 package org.marid.typedmap.wrapped;
 
 import org.marid.typedmap.Key;
-import org.marid.typedmap.TypedIMMap;
 import org.marid.typedmap.TypedMMMap;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * @author Dmitry Ovchinnikov
@@ -65,18 +67,6 @@ public class TypedWrappedMMMap<K extends Key<K, V>, V> implements TypedMMMap<K,V
 
     public TypedWrappedMMMap() {
         this(new HashMap<>());
-    }
-
-    @Nonnull
-    @Override
-    public Set<? extends K> keySet() {
-        return delegate.keySet();
-    }
-
-    @Nonnull
-    @Override
-    public Collection<? extends V> values() {
-        return delegate.values();
     }
 
     @Override
@@ -106,53 +96,33 @@ public class TypedWrappedMMMap<K extends Key<K, V>, V> implements TypedMMMap<K,V
     }
 
     @Override
-    public Collection<? extends TypedIMMap.Entry<K, V>> entries() {
-        return new AbstractCollection<TypedIMMap.Entry<K, V>>() {
-            @Nonnull
-            @Override
-            public Iterator<TypedIMMap.Entry<K, V>> iterator() {
-                final Iterator<Map.Entry<K, V>> mapEntries = delegate.entrySet().iterator();
-                return new Iterator<TypedIMMap.Entry<K, V>>() {
-                    @Override
-                    public boolean hasNext() {
-                        return mapEntries.hasNext();
-                    }
-
-                    @Override
-                    public TypedIMMap.Entry<K, V> next() {
-                        final Map.Entry<K, V> e = mapEntries.next();
-                        return new TypedIMMap.Entry<K, V>() {
-                            @Override
-                            public V setValue(V value) {
-                                return e.setValue(value);
-                            }
-
-                            @Nonnull
-                            @Override
-                            public K getKey() {
-                                return e.getKey();
-                            }
-
-                            @Nonnull
-                            @Override
-                            public V getValue() {
-                                return e.getValue();
-                            }
-                        };
-                    }
-                };
-            }
-
-            @Override
-            public int size() {
-                return TypedWrappedMMMap.this.size();
-            }
-        };
+    public void forEach(BiConsumer<K, V> consumer) {
+        delegate.forEach(consumer);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <KEY extends Key<KEY, VAL>, VAL extends V> VAL put(KEY key, VAL value) {
         return (VAL) delegate.put((K) key, value);
+    }
+
+    @Override
+    public void forEach(Consumer<Entry<K, V>> consumer) {
+        delegate.entrySet().forEach(e -> consumer.accept(new Entry<K, V>() {
+            @Override
+            public K getKey() {
+                return e.getKey();
+            }
+
+            @Override
+            public V getValue() {
+                return e.getValue();
+            }
+
+            @Override
+            public V setValue(V value) {
+                return e.setValue(value);
+            }
+        }));
     }
 }

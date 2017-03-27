@@ -13,25 +13,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap;
+package org.marid.typedmap.structlinked;
 
-import javax.annotation.Nonnull;
-import java.util.function.BiConsumer;
+import org.marid.typedmap.Key;
+import org.marid.typedmap.TypedIMMap;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-public interface TypedIIMap<K extends Key<K, V>, V> {
+interface LinkedStruct<K extends Key<K, V>, V> extends Iterable<TypedIMMap.Entry<K, V>> {
+
+    LinkedStruct<K, V> getNext();
 
     boolean containsKey(K key);
 
     boolean containsValue(V value);
-
-    int size();
-
-    boolean isEmpty();
-
-    <KEY extends Key<KEY, VAL>, VAL extends V> VAL get(@Nonnull KEY key);
-
-    void forEach(BiConsumer<K, V> consumer);
 }

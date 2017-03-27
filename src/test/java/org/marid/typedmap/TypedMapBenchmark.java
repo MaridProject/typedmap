@@ -91,7 +91,7 @@ public class TypedMapBenchmark {
         @Param({"5", "54", "180"})
         private int size;
 
-        @Param({"linkedMI", "hash", "fu", "fuSync"})
+        @Param({"linked", "hash", "fu", "fuSync"})
         private String type;
 
         private Supplier<TypedMIMap<TestKey<Integer>, Integer>> supplier;
@@ -120,7 +120,7 @@ public class TypedMapBenchmark {
             Collections.shuffle(pairs, random);
 
             switch (type) {
-                case "linkedMI":
+                case "linked":
                     supplier = TypedLinkedMMMap::new;
                     break;
                 case "hash":

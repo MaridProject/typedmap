@@ -1,0 +1,2 @@
+# typedmap
+TypedMap implementation

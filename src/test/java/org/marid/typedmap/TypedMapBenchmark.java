@@ -32,20 +32,21 @@ package org.marid.typedmap;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import javafx.util.Pair;
-import org.marid.typedmap.linked.TypedLinkedMIMap;
+import org.marid.typedmap.linked.TypedLinkedMMMap;
 import org.marid.typedmap.wrapped.TypedWrappedMMMap;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.profile.GCProfiler;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.util.Collections.synchronizedMap;
+import static java.util.Comparator.reverseOrder;
 
 /**
  * @author Dmitry Ovchinnikov
@@ -58,6 +59,8 @@ import static java.util.Collections.synchronizedMap;
 @Threads(Threads.MAX)
 @Fork(value = 1, jvmArgs = {"-XX:+UseG1GC"})
 public class TypedMapBenchmark {
+
+    private static final float LOSS_RATIO = 0.1f;
 
     @Benchmark
     public TypedMIMap<TestKey<Integer>, Integer> put(ThreadState state) {
@@ -72,8 +75,8 @@ public class TypedMapBenchmark {
     public int get(ThreadState state) {
         final TypedMIMap<TestKey<Integer>, Integer> map = state.map;
         int result = 0;
-        for (final Pair<TestKey<Integer>, Integer> pair : state.pairs) {
-            result ^= map.get(pair.getKey());
+        for (final TestKey<Integer> key : state.allKeys) {
+            result ^= Objects.hashCode(map.get(key));
         }
         return result;
     }
@@ -81,6 +84,8 @@ public class TypedMapBenchmark {
     @State(Scope.Thread)
     public static class ThreadState {
 
+        private final List<TestKey<Integer>> allKeys = new ArrayList<>();
+        private final List<TestKey<Integer>> keys = new ArrayList<>();
         private final List<Pair<TestKey<Integer>, Integer>> pairs = new ArrayList<>();
 
         @Param({"5", "54", "180"})
@@ -90,36 +95,52 @@ public class TypedMapBenchmark {
         private String type;
 
         private Supplier<TypedMIMap<TestKey<Integer>, Integer>> supplier;
-
         private TypedMIMap<TestKey<Integer>, Integer> map;
 
         @Setup
         public void init() {
+            final Random random = new Random(0L);
+
             for (int i = 0; i < size; i++) {
-                pairs.add(new Pair<>(new TestKey<>(), i));
+                final TestKey<Integer> key = new TestKey<>();
+                allKeys.add(key);
+                keys.add(key);
             }
+
+            final List<Integer> indices = IntStream.range(0, size).boxed().collect(Collectors.toList());
+            Collections.shuffle(indices, random);
+
+            final int loss = (int) (LOSS_RATIO * size);
+            indices.stream().limit(loss).sorted(reverseOrder()).forEachOrdered(i -> keys.remove(i.intValue()));
+
+            keys.forEach(k -> pairs.add(new Pair<>(k, random.nextInt())));
+            IntStream.generate(() -> random.nextInt(keys.size()))
+                    .limit(loss)
+                    .forEach(i -> pairs.add(new Pair<>(keys.get(i), random.nextInt())));
+            Collections.shuffle(pairs, random);
+
             switch (type) {
                 case "linkedMI":
-                    supplier = TypedLinkedMIMap::new;
+                    supplier = TypedLinkedMMMap::new;
                     break;
                 case "hash":
-                    supplier = () -> new TypedWrappedMMMap<>(new HashMap<TestKey<Integer>, Integer>(size));
+                    supplier = () -> new TypedWrappedMMMap<>(new HashMap<TestKey<Integer>, Integer>());
                     break;
                 case "fu":
                     supplier = () -> new TypedWrappedMMMap<>(
-                            new Object2ObjectOpenHashMap<TestKey<Integer>, Integer>(size)
+                            new Object2ObjectOpenHashMap<TestKey<Integer>, Integer>()
                     );
                     break;
                 case "fuSync":
                     supplier = () -> new TypedWrappedMMMap<>(
-                            synchronizedMap(new Object2ObjectOpenHashMap<TestKey<Integer>, Integer>(size))
+                            synchronizedMap(new Object2ObjectOpenHashMap<TestKey<Integer>, Integer>())
                     );
                     break;
                 default:
                     throw new IllegalArgumentException(type);
             }
             map = supplier.get();
-            pairs.forEach(p -> map.put(p.getKey(), p.getValue()));
+            keys.forEach(k -> map.put(k, random.nextInt()));
         }
     }
 

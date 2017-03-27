@@ -32,7 +32,8 @@ package org.marid.typedmap.linked;
 
 import org.marid.typedmap.Key;
 import org.marid.typedmap.TypedIIMap;
-import org.marid.typedmap.TypedMIMap;
+import org.marid.typedmap.TypedIMMap;
+import org.marid.typedmap.TypedMMMap;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -40,14 +41,14 @@ import java.util.*;
 /**
  * @author Dmitry Ovchinnikov
  */
-public final class TypedLinkedMIMap<K extends Key<K, V>, V> implements TypedMIMap<K, V> {
+public final class TypedLinkedMMMap<K extends Key<K, V>, V> implements TypedMMMap<K, V> {
 
     private LinkedEntry<K, V> entry;
 
-    public TypedLinkedMIMap() {
+    public TypedLinkedMMMap() {
     }
 
-    public TypedLinkedMIMap(TypedIIMap<K, V> map) {
+    public TypedLinkedMMMap(TypedIIMap<K, V> map) {
         map.entries().forEach(e -> put(e.getKey(), e.getValue()));
     }
 
@@ -62,7 +63,7 @@ public final class TypedLinkedMIMap<K extends Key<K, V>, V> implements TypedMIMa
                 @Nonnull
                 @Override
                 public Iterator<K> iterator() {
-                    final Iterator<LinkedEntry<K, V>> iterator = e.itr();
+                    final Iterator<LinkedEntry<K, V>> iterator = e.iterator();
                     return new Iterator<K>() {
                         @Override
                         public boolean hasNext() {
@@ -88,7 +89,7 @@ public final class TypedLinkedMIMap<K extends Key<K, V>, V> implements TypedMIMa
 
                 @Override
                 public int size() {
-                    return TypedLinkedMIMap.this.size();
+                    return TypedLinkedMMMap.this.size();
                 }
             };
         }
@@ -105,7 +106,7 @@ public final class TypedLinkedMIMap<K extends Key<K, V>, V> implements TypedMIMa
                 @Nonnull
                 @Override
                 public Iterator<V> iterator() {
-                    final Iterator<LinkedEntry<K, V>> iterator = e.itr();
+                    final Iterator<LinkedEntry<K, V>> iterator = e.iterator();
                     return new Iterator<V>() {
                         @Override
                         public boolean hasNext() {
@@ -131,7 +132,7 @@ public final class TypedLinkedMIMap<K extends Key<K, V>, V> implements TypedMIMa
 
                 @Override
                 public int size() {
-                    return TypedLinkedMIMap.this.size();
+                    return TypedLinkedMMMap.this.size();
                 }
             };
         }
@@ -183,7 +184,7 @@ public final class TypedLinkedMIMap<K extends Key<K, V>, V> implements TypedMIMa
     }
 
     @Override
-    public Collection<? extends Entry<K, V>> entries() {
+    public Collection<? extends TypedIMMap.Entry<K, V>> entries() {
         final LinkedEntry<K, V> e = entry;
         if (e == null) {
             return Collections.emptySet();
@@ -192,12 +193,12 @@ public final class TypedLinkedMIMap<K extends Key<K, V>, V> implements TypedMIMa
                 @Nonnull
                 @Override
                 public Iterator<LinkedEntry<K, V>> iterator() {
-                    return e.itr();
+                    return e.iterator();
                 }
 
                 @Override
                 public int size() {
-                    return TypedLinkedMIMap.this.size();
+                    return TypedLinkedMMMap.this.size();
                 }
             };
         }
@@ -206,17 +207,9 @@ public final class TypedLinkedMIMap<K extends Key<K, V>, V> implements TypedMIMa
     @SuppressWarnings("unchecked")
     @Override
     public <KEY extends Key<KEY, VAL>, VAL extends V> VAL put(KEY key, VAL value) {
-        LinkedEntry<K, V> prev = entry;
-        if (prev != null) {
-            if (prev.key == key) {
-                entry = new LinkedEntry<>(prev.key, value, prev.next);
-                return (VAL) prev.value;
-            }
-            for (LinkedEntry<K, V> e = prev.next; e != null; prev = e, e = e.next) {
-                if (e.key == key) {
-                    prev.next = new LinkedEntry<>(e.key, value, e.next);
-                    return (VAL) e.value;
-                }
+        for (LinkedEntry<K, V> e = entry; e != null; e = e.next) {
+            if (e.key == key) {
+                return (VAL) e.setValue(value);
             }
         }
         entry = new LinkedEntry<>((K) key, value, entry);

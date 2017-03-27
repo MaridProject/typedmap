@@ -31,7 +31,7 @@
 package org.marid.typedmap.linked;
 
 import org.marid.typedmap.Key;
-import org.marid.typedmap.TypedIIMap;
+import org.marid.typedmap.TypedIMMap;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -41,13 +41,13 @@ import java.util.NoSuchElementException;
 /**
  * @author Dmitry Ovchinnikov
  */
-final class LinkedEntry<K extends Key<K, V>, V> implements TypedIIMap.Entry<K, V> {
+final class LinkedEntry<K extends Key<K, V>, V> implements TypedIMMap.Entry<K, V>, Iterable<LinkedEntry<K, V>> {
 
     @Nonnull
     final K key;
 
     @Nonnull
-    final V value;
+    V value;
 
     @Nullable
     LinkedEntry<K, V> next;
@@ -70,7 +70,16 @@ final class LinkedEntry<K extends Key<K, V>, V> implements TypedIIMap.Entry<K, V
         return value;
     }
 
-    Iterator<LinkedEntry<K, V>> itr() {
+    @Override
+    public V setValue(V value) {
+        final V old = this.value;
+        this.value = value;
+        return old;
+    }
+
+    @Nonnull
+    @Override
+    public Iterator<LinkedEntry<K, V>> iterator() {
         return new Iterator<LinkedEntry<K, V>>() {
 
             private LinkedEntry<K, V> e = LinkedEntry.this;

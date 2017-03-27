@@ -1,4 +1,4 @@
-# typedmap
+# Performance characteristics
 
 | Map                           | size | get, ns/op |
 |-------------------------------|-----:|-----------:|

@@ -21,7 +21,7 @@ import java.util.function.BiConsumer;
 /**
  * @author Dmitry Ovchinnikov
  */
-public interface TypedIIMap<K extends Key<K, V>, V> {
+public interface TypedMap<K extends Key<K, V>, V> {
 
     boolean containsKey(K key);
 

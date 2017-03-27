@@ -15,10 +15,14 @@
 
 package org.marid.typedmap;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * @author Dmitry Ovchinnikov
  */
-public interface TypedMIMap<K extends Key<K, V>, V> extends TypedIIMap<K, V> {
+public interface TypedMutableMap<K extends Key<K, V>, V> extends TypedMap<K, V> {
 
-    <KEY extends Key<KEY, VAL>, VAL extends V> VAL put(KEY key, VAL value);
+    @Nullable
+    <KEY extends Key<KEY, VAL>, VAL extends V> VAL put(@Nonnull KEY key, @Nonnull VAL value);
 }

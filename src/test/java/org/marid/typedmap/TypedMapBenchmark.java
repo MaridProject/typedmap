@@ -32,20 +32,22 @@ package org.marid.typedmap;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import javafx.util.Pair;
-import org.marid.typedmap.linked.TypedLinkedMMMap;
-import org.marid.typedmap.wrapped.TypedWrappedMMMap;
+import org.marid.typedmap.linked.TypedLinkedMutableMap;
+import org.marid.typedmap.linked.TypedLinkedMutableSyncMap;
+import org.marid.typedmap.wrapped.TypedWrappedMap;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.profile.GCProfiler;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static java.util.Collections.synchronizedMap;
+import static it.unimi.dsi.fastutil.objects.Object2ObjectMaps.synchronize;
 import static java.util.Comparator.reverseOrder;
 
 /**
@@ -63,8 +65,8 @@ public class TypedMapBenchmark {
     private static final float LOSS_RATIO = 0.1f;
 
     @Benchmark
-    public TypedMIMap<TestKey<Integer>, Integer> put(ThreadState state) {
-        final TypedMIMap<TestKey<Integer>, Integer> map = state.supplier.get();
+    public TypedMutableMap<TestKey<Integer>, Integer> put(ThreadState state) {
+        final TypedMutableMap<TestKey<Integer>, Integer> map = state.supplier.get();
         for (final Pair<TestKey<Integer>, Integer> pair : state.pairs) {
             map.put(pair.getKey(), pair.getValue());
         }
@@ -73,7 +75,7 @@ public class TypedMapBenchmark {
 
     @Benchmark
     public int get(ThreadState state) {
-        final TypedMIMap<TestKey<Integer>, Integer> map = state.map;
+        final TypedMutableMap<TestKey<Integer>, Integer> map = state.map;
         int result = 0;
         for (final TestKey<Integer> key : state.allKeys) {
             result ^= Objects.hashCode(map.get(key));
@@ -91,11 +93,11 @@ public class TypedMapBenchmark {
         @Param({"5", "54", "180"})
         private int size;
 
-        @Param({"linked", "hash", "fu", "fuSync"})
+        @Param({"linked", "hash", "fu", "linkeds", "chash", "fus"})
         private String type;
 
-        private Supplier<TypedMIMap<TestKey<Integer>, Integer>> supplier;
-        private TypedMIMap<TestKey<Integer>, Integer> map;
+        private Supplier<TypedMutableMap<TestKey<Integer>, Integer>> supplier;
+        private TypedMutableMap<TestKey<Integer>, Integer> map;
 
         @Setup
         public void init() {
@@ -121,26 +123,32 @@ public class TypedMapBenchmark {
 
             switch (type) {
                 case "linked":
-                    supplier = TypedLinkedMMMap::new;
+                    supplier = TypedLinkedMutableMap::new;
                     break;
                 case "hash":
-                    supplier = () -> new TypedWrappedMMMap<>(new HashMap<TestKey<Integer>, Integer>());
+                    supplier = wrap(HashMap::new);
                     break;
                 case "fu":
-                    supplier = () -> new TypedWrappedMMMap<>(
-                            new Object2ObjectOpenHashMap<TestKey<Integer>, Integer>()
-                    );
+                    supplier = wrap(Object2ObjectOpenHashMap::new);
                     break;
-                case "fuSync":
-                    supplier = () -> new TypedWrappedMMMap<>(
-                            synchronizedMap(new Object2ObjectOpenHashMap<TestKey<Integer>, Integer>())
-                    );
+                case "linkeds":
+                    supplier = TypedLinkedMutableSyncMap::new;
+                    break;
+                case "chash":
+                    supplier = wrap(ConcurrentHashMap::new);
+                    break;
+                case "fus":
+                    supplier = wrap(() -> synchronize(new Object2ObjectOpenHashMap<>()));
                     break;
                 default:
                     throw new IllegalArgumentException(type);
             }
             map = supplier.get();
             keys.forEach(k -> map.put(k, random.nextInt()));
+        }
+
+        private Supplier<TypedMutableMap<TestKey<Integer>, Integer>> wrap(Supplier<Map<TestKey<Integer>, Integer>> s) {
+            return () -> new TypedWrappedMap<>(s.get());
         }
     }
 

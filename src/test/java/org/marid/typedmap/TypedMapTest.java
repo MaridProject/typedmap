@@ -16,8 +16,8 @@
 package org.marid.typedmap;
 
 import org.apache.commons.math3.util.Pair;
-import org.marid.typedmap.linked.TypedLinkedMMMap;
-import org.marid.typedmap.wrapped.TypedWrappedMMMap;
+import org.marid.typedmap.linked.TypedLinkedMutableSyncMap;
+import org.marid.typedmap.wrapped.TypedWrappedMap;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -36,9 +36,9 @@ public class TypedMapTest {
 
     private static final int ENTRY_COUNT = 77;
     private static final int ENTRY_SET_COUNT = 10;
-    private static final List<Supplier<TypedMIMap<TestKey<Integer>, Integer>>> MAP_SUPPLIERS = Arrays.asList(
-            TypedLinkedMMMap::new,
-            TypedWrappedMMMap::new
+    private static final List<Supplier<TypedMutableMap<TestKey<Integer>, Integer>>> MAP_SUPPLIERS = Arrays.asList(
+            TypedLinkedMutableSyncMap::new,
+            TypedWrappedMap::new
     );
 
     @DataProvider
@@ -64,7 +64,7 @@ public class TypedMapTest {
     }
 
     @Test(dataProvider = "setsOfEntries")
-    public void test(TypedMIMap<TestKey<Integer>, Integer> map, List<Pair<TestKey<Integer>, Integer>> pairs) {
+    public void test(TypedMutableMap<TestKey<Integer>, Integer> map, List<Pair<TestKey<Integer>, Integer>> pairs) {
         final Map<TestKey<Integer>, Integer> expectedMap = pairs.stream()
                 .collect(toMap(Pair::getKey, Pair::getValue, (v1, v2) -> v2));
 

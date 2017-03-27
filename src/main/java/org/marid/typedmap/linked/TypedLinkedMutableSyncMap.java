@@ -31,33 +31,29 @@
 package org.marid.typedmap.linked;
 
 import org.marid.typedmap.Key;
-import org.marid.typedmap.TypedIIMap;
-import org.marid.typedmap.TypedMMMap;
+import org.marid.typedmap.TypedMap;
+import org.marid.typedmap.TypedMutableMap;
 
 import javax.annotation.Nonnull;
-import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
+import javax.annotation.Nullable;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-public final class TypedLinkedMMMap<K extends Key<K, V>, V> implements TypedMMMap<K, V> {
+public final class TypedLinkedMutableSyncMap<K extends Key<K, V>, V> implements TypedMutableMap<K,V> {
 
-    private static final AtomicReferenceFieldUpdater<TypedLinkedMMMap, LinkedEntry> F =
-            AtomicReferenceFieldUpdater.newUpdater(TypedLinkedMMMap.class, LinkedEntry.class, "entry");
+    private LinkedEntry<K, V> entry;
 
-    private volatile LinkedEntry<K, V> entry;
-
-    public TypedLinkedMMMap() {
+    public TypedLinkedMutableSyncMap() {
     }
 
-    public TypedLinkedMMMap(TypedIIMap<K, V> map) {
+    public TypedLinkedMutableSyncMap(TypedMap<K, V> map) {
         map.forEach(this::put);
     }
 
     @Override
-    public boolean containsKey(@Nonnull K key) {
+    public synchronized boolean containsKey(@Nonnull K key) {
         for (LinkedEntry<K, ?> en = entry; en != null; en = en.next) {
             if (en.key == key) {
                 return true;
@@ -67,7 +63,7 @@ public final class TypedLinkedMMMap<K extends Key<K, V>, V> implements TypedMMMa
     }
 
     @Override
-    public boolean containsValue(@Nonnull V value) {
+    public synchronized boolean containsValue(@Nonnull V value) {
         for (LinkedEntry<K, ?> en = entry; en != null; en = en.next) {
             if (en.value.equals(value)) {
                 return true;
@@ -77,7 +73,7 @@ public final class TypedLinkedMMMap<K extends Key<K, V>, V> implements TypedMMMa
     }
 
     @Override
-    public int size() {
+    public synchronized int size() {
         int s = 0;
         for (LinkedEntry<K, ?> e = entry; e != null; e = e.next) {
             s++;
@@ -86,13 +82,13 @@ public final class TypedLinkedMMMap<K extends Key<K, V>, V> implements TypedMMMa
     }
 
     @Override
-    public boolean isEmpty() {
+    public synchronized boolean isEmpty() {
         return entry == null;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <KEY extends Key<KEY, VAL>, VAL extends V> VAL get(@Nonnull KEY key) {
+    public synchronized <KEY extends Key<KEY, VAL>, VAL extends V> VAL get(@Nonnull KEY key) {
         for (LinkedEntry<K, V> e = entry; e != null; e = e.next) {
             if (e.key == key) {
                 return (VAL) e.value;
@@ -102,28 +98,22 @@ public final class TypedLinkedMMMap<K extends Key<K, V>, V> implements TypedMMMa
     }
 
     @Override
-    public void forEach(BiConsumer<K, V> consumer) {
+    public synchronized void forEach(BiConsumer<K, V> consumer) {
         for (LinkedEntry<K, V> e = entry; e != null; e = e.next) {
             consumer.accept(e.key, e.value);
         }
     }
 
     @SuppressWarnings("unchecked")
+    @Nullable
     @Override
-    public <KEY extends Key<KEY, VAL>, VAL extends V> VAL put(KEY key, VAL value) {
+    public synchronized <KEY extends Key<KEY, VAL>, VAL extends V> VAL put(@Nonnull KEY key, @Nonnull VAL value) {
         for (LinkedEntry<K, V> e = entry; e != null; e = e.next) {
             if (e.key == key) {
                 return (VAL) e.setValue(value);
             }
         }
-        F.updateAndGet(this, e -> new LinkedEntry(e, key, value));
+        entry = new LinkedEntry<>(entry, (K) key, value);
         return null;
-    }
-
-    @Override
-    public void forEach(Consumer<Entry<K, V>> consumer) {
-        for (LinkedEntry<K, V> e = entry; e != null; e = e.next) {
-            consumer.accept(e);
-        }
     }
 }

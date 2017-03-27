@@ -43,86 +43,92 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap.wrapped;
+package org.marid.typedmap.linked;
 
 import org.marid.typedmap.Key;
-import org.marid.typedmap.TypedMMMap;
+import org.marid.typedmap.TypedMap;
+import org.marid.typedmap.TypedMutableMap;
 
 import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.Map;
+import javax.annotation.Nullable;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedWrappedMMMap<K extends Key<K, V>, V> implements TypedMMMap<K,V> {
+public final class TypedLinkedMutableMap<K extends Key<K, V>, V> implements TypedMutableMap<K,V> {
 
-    private final Map<K, V> delegate;
+    private LinkedEntry<K, V> entry;
 
-    public TypedWrappedMMMap(Map<K, V> delegate) {
-        this.delegate = delegate;
+    public TypedLinkedMutableMap() {
     }
 
-    public TypedWrappedMMMap() {
-        this(new HashMap<>());
-    }
-
-    @Override
-    public boolean containsKey(K key) {
-        return delegate.containsKey(key);
+    public TypedLinkedMutableMap(TypedMap<K, V> map) {
+        map.forEach(this::put);
     }
 
     @Override
-    public boolean containsValue(V value) {
-        return delegate.containsValue(value);
+    public boolean containsKey(@Nonnull K key) {
+        for (LinkedEntry<K, ?> en = entry; en != null; en = en.next) {
+            if (en.key == key) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean containsValue(@Nonnull V value) {
+        for (LinkedEntry<K, ?> en = entry; en != null; en = en.next) {
+            if (en.value.equals(value)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
     public int size() {
-        return delegate.size();
+        int s = 0;
+        for (LinkedEntry<K, ?> e = entry; e != null; e = e.next) {
+            s++;
+        }
+        return s;
     }
 
     @Override
     public boolean isEmpty() {
-        return delegate.isEmpty();
+        return entry == null;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <KEY extends Key<KEY, VAL>, VAL extends V> VAL get(@Nonnull KEY key) {
-        return (VAL) delegate.getOrDefault(key, key.getDefault());
+        for (LinkedEntry<K, V> e = entry; e != null; e = e.next) {
+            if (e.key == key) {
+                return (VAL) e.value;
+            }
+        }
+        return key.getDefault();
     }
 
     @Override
     public void forEach(BiConsumer<K, V> consumer) {
-        delegate.forEach(consumer);
+        for (LinkedEntry<K, V> e = entry; e != null; e = e.next) {
+            consumer.accept(e.key, e.value);
+        }
     }
 
     @SuppressWarnings("unchecked")
+    @Nullable
     @Override
-    public <KEY extends Key<KEY, VAL>, VAL extends V> VAL put(KEY key, VAL value) {
-        return (VAL) delegate.put((K) key, value);
-    }
-
-    @Override
-    public void forEach(Consumer<Entry<K, V>> consumer) {
-        delegate.entrySet().forEach(e -> consumer.accept(new Entry<K, V>() {
-            @Override
-            public K getKey() {
-                return e.getKey();
+    public <KEY extends Key<KEY, VAL>, VAL extends V> VAL put(@Nonnull KEY key, @Nonnull VAL value) {
+        for (LinkedEntry<K, V> e = entry; e != null; e = e.next) {
+            if (e.key == key) {
+                return (VAL) e.setValue(value);
             }
-
-            @Override
-            public V getValue() {
-                return e.getValue();
-            }
-
-            @Override
-            public V setValue(V value) {
-                return e.setValue(value);
-            }
-        }));
+        }
+        entry = new LinkedEntry<>(entry, (K) key, value);
+        return null;
     }
 }

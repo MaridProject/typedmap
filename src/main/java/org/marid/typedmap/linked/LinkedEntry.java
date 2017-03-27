@@ -31,28 +31,23 @@
 package org.marid.typedmap.linked;
 
 import org.marid.typedmap.Key;
-import org.marid.typedmap.TypedIMMap;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-final class LinkedEntry<K extends Key<K, V>, V> implements TypedIMMap.Entry<K, V> {
-
-    private static final AtomicReferenceFieldUpdater<LinkedEntry, Object> F =
-            AtomicReferenceFieldUpdater.newUpdater(LinkedEntry.class, Object.class, "value");
+final class LinkedEntry<K extends Key<K, V>, V> {
 
     @Nullable
-    volatile LinkedEntry<K, V> next;
+    LinkedEntry<K, V> next;
 
     @Nonnull
     final K key;
 
     @Nonnull
-    volatile V value;
+    V value;
 
     LinkedEntry(@Nullable LinkedEntry<K, V> next, @Nonnull K key, @Nonnull V value) {
         this.key = key;
@@ -60,21 +55,10 @@ final class LinkedEntry<K extends Key<K, V>, V> implements TypedIMMap.Entry<K, V
         this.next = next;
     }
 
-    @Nonnull
-    @Override
-    public K getKey() {
-        return key;
-    }
-
-    @Nonnull
-    @Override
-    public V getValue() {
-        return value;
-    }
-
     @SuppressWarnings("unchecked")
-    @Override
-    public V setValue(V value) {
-        return (V) F.getAndSet(this, value);
+    V setValue(V value) {
+        final V old = this.value;
+        this.value = value;
+        return old;
     }
 }

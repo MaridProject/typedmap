@@ -32,6 +32,8 @@ package org.marid.typedmap;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import javafx.util.Pair;
+import org.marid.typedmap.linked.TypedLinkedMIMap;
+import org.marid.typedmap.wrapped.TypedWrappedMMMap;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.profile.GCProfiler;
 import org.openjdk.jmh.runner.Runner;
@@ -84,7 +86,7 @@ public class TypedMapBenchmark {
         @Param({"5", "54", "180"})
         private int size;
 
-        @Param({"linkedMI", "linkedIdMI", "hash", "fu", "fuSync"})
+        @Param({"linkedMI", "hash", "fu", "fuSync"})
         private String type;
 
         private Supplier<TypedMIMap<TestKey<Integer>, Integer>> supplier;
@@ -98,21 +100,18 @@ public class TypedMapBenchmark {
             }
             switch (type) {
                 case "linkedMI":
-                    supplier = LinkedTypedMIMap::new;
-                    break;
-                case "linkedIdMI":
-                    supplier = LinkedTypedIdentityMIMap::new;
+                    supplier = TypedLinkedMIMap::new;
                     break;
                 case "hash":
-                    supplier = () -> new TypedForwardingMMMap<>(new HashMap<TestKey<Integer>, Integer>(size));
+                    supplier = () -> new TypedWrappedMMMap<>(new HashMap<TestKey<Integer>, Integer>(size));
                     break;
                 case "fu":
-                    supplier = () -> new TypedForwardingMMMap<>(
+                    supplier = () -> new TypedWrappedMMMap<>(
                             new Object2ObjectOpenHashMap<TestKey<Integer>, Integer>(size)
                     );
                     break;
                 case "fuSync":
-                    supplier = () -> new TypedForwardingMMMap<>(
+                    supplier = () -> new TypedWrappedMMMap<>(
                             synchronizedMap(new Object2ObjectOpenHashMap<TestKey<Integer>, Integer>(size))
                     );
                     break;

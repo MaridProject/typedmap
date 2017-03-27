@@ -17,6 +17,8 @@ package org.marid.typedmap;
 
 import org.apache.commons.math3.util.Pair;
 import org.marid.typedmap.TypedIIMap.Entry;
+import org.marid.typedmap.linked.TypedLinkedMIMap;
+import org.marid.typedmap.wrapped.TypedWrappedMMMap;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -39,8 +41,8 @@ public class TypedMapTest {
     private static final int ENTRY_COUNT = 10;
     private static final int ENTRY_SET_COUNT = 10;
     private static final List<Supplier<TypedMIMap<TestKey<Integer>, Integer>>> MAP_SUPPLIERS = Arrays.asList(
-            LinkedTypedMIMap::new,
-            TypedForwardingMMMap::new
+            TypedLinkedMIMap::new,
+            TypedWrappedMMMap::new
     );
 
     @DataProvider

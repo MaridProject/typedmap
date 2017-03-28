@@ -15,12 +15,16 @@
 
 package org.marid.typedmap.benchmark;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrays;
+import org.marid.typedmap.TestKey;
+import org.marid.typedmap.TypedMutableMap;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 
 import static org.marid.typedmap.benchmark.TypedMapGetBenchmark.SIZE;
 
@@ -52,5 +56,24 @@ public class TypedMapGetBenchmark {
                 .include(TypedMapGetBenchmark.class.getSimpleName())
                 .build()
         ).run();
+    }
+
+    @State(Scope.Thread)
+    public static class GetState {
+
+        final TestKey[] keys = new TestKey[SIZE];
+
+        @Param({"linked", "fu", "linkeds", "chash", "fus"})
+        private String type;
+
+        TypedMutableMap<TestKey, Integer> map;
+
+        @Setup
+        public void init(ThreadState state) {
+            System.arraycopy(state.keys, 0, keys, 0, keys.length);
+            map = TypedMapFactory.byType(type).get();
+            IntStream.range(0, keys.length).forEach(i -> map.put(state.keys[i], state.values[i]));
+            ObjectArrays.shuffle(keys, state.random);
+        }
     }
 }

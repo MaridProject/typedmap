@@ -23,6 +23,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import static org.marid.typedmap.benchmark.TypedMapPutBenchmark.SIZE;
 
@@ -56,5 +57,19 @@ public class TypedMapPutBenchmark {
                 .shouldDoGC(true)
                 .build()
         ).run();
+    }
+
+    @State(Scope.Thread)
+    public static class PutState {
+
+        @Param({"linked", "fu", "linkeds", "chash", "fus"})
+        private String type;
+
+        Supplier<TypedMutableMap<TestKey, Integer>> supplier;
+
+        @Setup
+        public void init() {
+            supplier = TypedMapFactory.byType(type);
+        }
     }
 }

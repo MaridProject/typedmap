@@ -70,12 +70,12 @@ public class TypedWrappedMap<K extends Key<K, V>, V> implements TypedMutableMap<
     }
 
     @Override
-    public boolean containsKey(K key) {
+    public boolean containsKey(@Nonnull K key) {
         return delegate.containsKey(key);
     }
 
     @Override
-    public boolean containsValue(V value) {
+    public boolean containsValue(@Nonnull V value) {
         return delegate.containsValue(value);
     }
 
@@ -90,20 +90,25 @@ public class TypedWrappedMap<K extends Key<K, V>, V> implements TypedMutableMap<
     }
 
     @SuppressWarnings("unchecked")
+    @Nullable
     @Override
     public <KEY extends Key<KEY, VAL>, VAL extends V> VAL get(@Nonnull KEY key) {
         return (VAL) delegate.getOrDefault(key, key.getDefault());
     }
 
     @Override
-    public void forEach(BiConsumer<K, V> consumer) {
+    public void forEach(@Nonnull BiConsumer<K, V> consumer) {
         delegate.forEach(consumer);
     }
 
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
-    public <KEY extends Key<KEY, VAL>, VAL extends V> VAL put(@Nonnull KEY key, @Nonnull VAL value) {
-        return (VAL) delegate.put((K) key, value);
+    public <KEY extends Key<KEY, VAL>, VAL extends V> VAL put(@Nonnull KEY key, @Nullable VAL value) {
+        if (value == null) {
+            return (VAL) delegate.remove((K) key);
+        } else {
+            return (VAL) delegate.put((K) key, value);
+        }
     }
 }

@@ -16,7 +16,7 @@
 package org.marid.typedmap;
 
 import org.apache.commons.math3.util.Pair;
-import org.marid.typedmap.linked.TypedLinkedMutableSyncMap;
+import org.marid.typedmap.linked.TypedLinkedMap;
 import org.marid.typedmap.wrapped.TypedWrappedMap;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -36,14 +36,14 @@ public class TypedMapTest {
 
     private static final int ENTRY_COUNT = 77;
     private static final int ENTRY_SET_COUNT = 10;
-    private static final List<Supplier<TypedMutableMap<TestKey<Integer>, Integer>>> MAP_SUPPLIERS = Arrays.asList(
-            TypedLinkedMutableSyncMap::new,
-            TypedWrappedMap::new
+    private static final List<Supplier<TypedMutableMap<TestKey, Integer>>> MAP_SUPPLIERS = Arrays.asList(
+            TypedWrappedMap::new,
+            TypedLinkedMap::new
     );
 
     @DataProvider
     public Object[][] setsOfEntries() {
-        final List<TestKey<Integer>> keys = IntStream.range(0, ENTRY_SET_COUNT * ENTRY_COUNT)
+        final List<TestKey> keys = IntStream.range(0, ENTRY_SET_COUNT * ENTRY_COUNT)
                 .mapToObj(TestKey::new)
                 .collect(Collectors.toList());
         return MAP_SUPPLIERS.stream()
@@ -52,7 +52,7 @@ public class TypedMapTest {
                             final Random random = new Random(1000L * i);
                             return IntStream.range(0, ENTRY_COUNT)
                                     .mapToObj(k -> {
-                                        final TestKey<Integer> key = keys.get(random.nextInt(keys.size()));
+                                        final TestKey key = keys.get(random.nextInt(keys.size()));
                                         final Integer value = random.nextInt();
                                         return new Pair<>(key, value);
                                     })
@@ -64,13 +64,13 @@ public class TypedMapTest {
     }
 
     @Test(dataProvider = "setsOfEntries")
-    public void test(TypedMutableMap<TestKey<Integer>, Integer> map, List<Pair<TestKey<Integer>, Integer>> pairs) {
-        final Map<TestKey<Integer>, Integer> expectedMap = pairs.stream()
+    public void test(TypedMutableMap<TestKey, Integer> map, List<Pair<TestKey, Integer>> pairs) {
+        final Map<TestKey, Integer> expectedMap = pairs.stream()
                 .collect(toMap(Pair::getKey, Pair::getValue, (v1, v2) -> v2));
 
         pairs.forEach(p -> map.put(p.getKey(), p.getValue()));
 
-        final Map<TestKey<Integer>, Integer> actualMap = new HashMap<>();
+        final Map<TestKey, Integer> actualMap = new HashMap<>();
         map.forEach(actualMap::put);
 
         assertEquals(actualMap, expectedMap);

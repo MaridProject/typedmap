@@ -28,37 +28,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap.linked;
+package org.marid.typedmap.benchmark;
 
-import org.marid.typedmap.Key;
+import org.marid.typedmap.TestKey;
+import org.marid.typedmap.TypedMutableMap;
+import org.openjdk.jmh.annotations.Param;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.function.Supplier;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-final class LinkedEntry<K extends Key<K, V>, V> {
+@State(Scope.Thread)
+public class PutState {
 
-    @Nullable
-    LinkedEntry<K, V> next;
+    @Param({"linked", "fu", "linkeds", "chash", "fus"})
+    private String type;
 
-    @Nonnull
-    final K key;
+    Supplier<TypedMutableMap<TestKey, Integer>> supplier;
 
-    @Nonnull
-    V value;
-
-    LinkedEntry(@Nullable LinkedEntry<K, V> next, @Nonnull K key, @Nonnull V value) {
-        this.key = key;
-        this.value = value;
-        this.next = next;
-    }
-
-    @SuppressWarnings("unchecked")
-    V setValue(V value) {
-        final V old = this.value;
-        this.value = value;
-        return old;
+    @Setup
+    public void init() {
+        supplier = TypedMapFactory.byType(type);
     }
 }

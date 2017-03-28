@@ -13,16 +13,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap;
+package org.marid.typedmap.benchmark;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.marid.typedmap.TestKey;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.State;
+
+import java.util.Random;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-public interface TypedMutableMap<K extends Key<K, V>, V> extends TypedMap<K, V> {
+@State(Scope.Thread)
+public class ThreadState {
 
-    @Nullable
-    <KEY extends Key<KEY, VAL>, VAL extends V> VAL put(@Nonnull KEY key, @Nullable VAL value);
+    final Random random = new Random(0);
+    final TestKey[] keys = random.ints().limit(TypedMapGetBenchmark.SIZE).mapToObj(TestKey::new).toArray(TestKey[]::new);
+    final Integer[] values = random.ints().limit(TypedMapGetBenchmark.SIZE).boxed().toArray(Integer[]::new);
 }

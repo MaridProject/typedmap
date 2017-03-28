@@ -16,6 +16,7 @@
 package org.marid.typedmap;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.function.BiConsumer;
 
 /**
@@ -23,15 +24,16 @@ import java.util.function.BiConsumer;
  */
 public interface TypedMap<K extends Key<K, V>, V> {
 
-    boolean containsKey(K key);
+    boolean containsKey(@Nonnull K key);
 
-    boolean containsValue(V value);
+    boolean containsValue(@Nonnull V value);
 
     int size();
 
     boolean isEmpty();
 
+    @Nullable
     <KEY extends Key<KEY, VAL>, VAL extends V> VAL get(@Nonnull KEY key);
 
-    void forEach(BiConsumer<K, V> consumer);
+    void forEach(@Nonnull BiConsumer<K, V> consumer);
 }

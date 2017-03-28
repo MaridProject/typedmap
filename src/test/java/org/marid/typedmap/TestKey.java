@@ -20,11 +20,11 @@ import javax.annotation.Nullable;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TestKey<V> implements Key<TestKey<V>, V> {
+public class TestKey implements Key<TestKey, Integer> {
 
-    private final V defaultValue;
+    private final Integer defaultValue;
 
-    public TestKey(V defaultValue) {
+    public TestKey(Integer defaultValue) {
         this.defaultValue = defaultValue;
     }
 
@@ -34,7 +34,7 @@ public class TestKey<V> implements Key<TestKey<V>, V> {
 
     @Nullable
     @Override
-    public V getDefault() {
+    public Integer getDefault() {
         return defaultValue;
     }
 }

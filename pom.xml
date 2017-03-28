@@ -319,5 +319,12 @@
             <version>7.1.0</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.eclipse.collections</groupId>
+            <artifactId>eclipse-collections</artifactId>
+            <version>8.1.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

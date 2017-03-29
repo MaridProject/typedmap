@@ -62,7 +62,7 @@ public class TypedMapPutBenchmark {
     @State(Scope.Thread)
     public static class PutState {
 
-        @Param({"linked", "fu", "linkeds", "chash", "fus"})
+        @Param({"linked", "tree", "fu", "linkeds", "chash", "fus"})
         private String type;
 
         Supplier<TypedMutableMap<TestKey, Integer>> supplier;

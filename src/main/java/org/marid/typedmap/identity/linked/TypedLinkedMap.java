@@ -13,8 +13,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap.linked;
+package org.marid.typedmap.identity.linked;
 
+import org.marid.typedmap.KeyDomain;
 import org.marid.typedmap.Key;
 import org.marid.typedmap.TypedMutableMap;
 
@@ -25,9 +26,9 @@ import java.util.function.BiConsumer;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedLinkedMap<K extends Key<K, V>, V> implements TypedMutableMap<K, V> {
+public class TypedLinkedMap<D extends KeyDomain, K extends Key<D, V>, V> implements TypedMutableMap<D, K, V> {
 
-    private TypedLinkedMap<K, V> next;
+    private TypedLinkedMap<D, K, V> next;
     private K key;
     private V value;
 
@@ -54,8 +55,8 @@ public class TypedLinkedMap<K extends Key<K, V>, V> implements TypedMutableMap<K
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
-    public <KEY extends Key<KEY, VAL>, VAL extends V> VAL get(@Nonnull KEY key) {
-        for (TypedLinkedMap<K, V> m = this; m != null; m = m.next) {
+    public <VAL extends V> VAL get(@Nonnull Key<? super D, VAL> key) {
+        for (TypedLinkedMap<D, K, V> m = this; m != null; m = m.next) {
             if (m.key == key) {
                 return (VAL) m.value;
             }
@@ -65,7 +66,7 @@ public class TypedLinkedMap<K extends Key<K, V>, V> implements TypedMutableMap<K
 
     @Override
     public void forEach(@Nonnull BiConsumer<K, V> consumer) {
-        for (TypedLinkedMap<K, V> m = this; m != null; m = m.next) {
+        for (TypedLinkedMap<D, K, V> m = this; m != null; m = m.next) {
             if (m.key != null) {
                 consumer.accept(m.key, m.value);
             }
@@ -75,19 +76,19 @@ public class TypedLinkedMap<K extends Key<K, V>, V> implements TypedMutableMap<K
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
-    public <KEY extends Key<KEY, VAL>, VAL extends V> VAL put(@Nonnull KEY key, @Nullable VAL value) {
+    public <VAL extends V> VAL put(@Nonnull Key<? super D, VAL> key, @Nullable VAL value) {
         if (this.key == null) {
             this.key = (K) key;
             this.value = value;
         } else {
-            for (TypedLinkedMap<K, V> m = this; m != null; m = m.next) {
+            for (TypedLinkedMap<D, K, V> m = this; m != null; m = m.next) {
                 if (m.key == key) {
                     final V old = m.value;
                     m.value = value;
                     return (VAL) old;
                 }
             }
-            final TypedLinkedMap<K, V> map = new TypedLinkedMap<>();
+            final TypedLinkedMap<D, K, V> map = new TypedLinkedMap<>();
             map.next = next;
             map.key = this.key;
             map.value = this.value;

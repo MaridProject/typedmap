@@ -13,20 +13,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap.benchmark;
+package org.marid.typedmap.identity.benchmark;
 
-import it.unimi.dsi.fastutil.objects.ObjectArrays;
 import org.marid.typedmap.TestKey;
+import org.marid.typedmap.TestKeyDomain;
 import org.marid.typedmap.TypedMutableMap;
 import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.profile.GCProfiler;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.IntStream;
+import java.util.function.Supplier;
 
-import static org.marid.typedmap.benchmark.TypedMapGetBenchmark.SIZE;
+import static org.marid.typedmap.identity.benchmark.TypedMapPutBenchmark.SIZE;
 
 /**
  * @author Dmitry Ovchinnikov
@@ -38,42 +38,39 @@ import static org.marid.typedmap.benchmark.TypedMapGetBenchmark.SIZE;
 @Measurement(iterations = 5, batchSize = 100_000)
 @Threads(Threads.MAX)
 @Fork(value = 1, jvmArgs = {"-XX:+UseG1GC"})
-public class TypedMapGetBenchmark {
+public class TypedMapPutBenchmark {
 
     static final int SIZE = 50;
 
     @Benchmark
-    public int get(GetState getState) {
-        int s = 0;
+    public TypedMutableMap<TestKeyDomain, TestKey, Integer> put(ThreadState state, PutState putState) {
+        final TypedMutableMap<TestKeyDomain, TestKey, Integer> map = putState.supplier.get();
         for (int i = 0; i < SIZE; i++) {
-            s ^= Objects.hashCode(getState.map.get(getState.keys[i]));
+            map.put(state.keys[i], state.values[i]);
         }
-        return s;
+        return map;
     }
 
     public static void main(String... args) throws Exception {
         new Runner(new OptionsBuilder()
-                .include(TypedMapGetBenchmark.class.getSimpleName())
+                .include(TypedMapPutBenchmark.class.getSimpleName())
+                .addProfiler(GCProfiler.class)
+                .shouldDoGC(true)
                 .build()
         ).run();
     }
 
     @State(Scope.Thread)
-    public static class GetState {
+    public static class PutState {
 
-        final TestKey[] keys = new TestKey[SIZE];
-
-        @Param({"linked", "fu", "linkeds", "chash", "fus"})
+        @Param({"linked", "tree", "fu", "linkeds", "chash", "fus"})
         private String type;
 
-        TypedMutableMap<TestKey, Integer> map;
+        Supplier<TypedMutableMap<TestKeyDomain, TestKey, Integer>> supplier;
 
         @Setup
-        public void init(ThreadState state) {
-            System.arraycopy(state.keys, 0, keys, 0, keys.length);
-            map = TypedMapFactory.byType(type).get();
-            IntStream.range(0, keys.length).forEach(i -> map.put(state.keys[i], state.values[i]));
-            ObjectArrays.shuffle(keys, state.random);
+        public void init() {
+            supplier = TypedMapFactory.byType(type);
         }
     }
 }

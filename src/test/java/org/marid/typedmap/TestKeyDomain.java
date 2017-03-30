@@ -15,13 +15,8 @@
 
 package org.marid.typedmap;
 
-import javax.annotation.Nullable;
-
 /**
  * @author Dmitry Ovchinnikov
  */
-public interface Key<D extends KeyDomain, T> {
-
-    @Nullable
-    T getDefault();
+public class TestKeyDomain implements KeyDomain {
 }

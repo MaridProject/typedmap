@@ -13,11 +13,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap;
+package org.marid.typedmap.identity;
 
 import org.apache.commons.math3.util.Pair;
-import org.marid.typedmap.linked.TypedLinkedMap;
-import org.marid.typedmap.wrapped.TypedWrappedMap;
+import org.marid.typedmap.TestKey;
+import org.marid.typedmap.TestKeyDomain;
+import org.marid.typedmap.TypedMutableMap;
+import org.marid.typedmap.identity.linked.TypedLinkedMap;
+import org.marid.typedmap.identity.wrapped.TypedWrappedMap;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -36,7 +39,7 @@ public class TypedMapTest {
 
     private static final int ENTRY_COUNT = 77;
     private static final int ENTRY_SET_COUNT = 10;
-    private static final List<Supplier<TypedMutableMap<TestKey, Integer>>> MAP_SUPPLIERS = Arrays.asList(
+    private static final List<Supplier<TypedMutableMap<TestKeyDomain, TestKey, Integer>>> MAP_SUPPLIERS = Arrays.asList(
             TypedWrappedMap::new,
             TypedLinkedMap::new
     );
@@ -64,7 +67,7 @@ public class TypedMapTest {
     }
 
     @Test(dataProvider = "setsOfEntries")
-    public void test(TypedMutableMap<TestKey, Integer> map, List<Pair<TestKey, Integer>> pairs) {
+    public void test(TypedMutableMap<TestKeyDomain, TestKey, Integer> map, List<Pair<TestKey, Integer>> pairs) {
         final Map<TestKey, Integer> expectedMap = pairs.stream()
                 .collect(toMap(Pair::getKey, Pair::getValue, (v1, v2) -> v2));
 

@@ -13,14 +13,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap.benchmark;
+package org.marid.typedmap.identity.benchmark;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.marid.typedmap.TestKey;
+import org.marid.typedmap.TestKeyDomain;
 import org.marid.typedmap.TypedMutableMap;
-import org.marid.typedmap.linked.TypedLinkedMap;
-import org.marid.typedmap.linked.TypedLinkedSyncMap;
-import org.marid.typedmap.wrapped.TypedWrappedMap;
+import org.marid.typedmap.identity.linked.TypedLinkedMap;
+import org.marid.typedmap.identity.linked.TypedLinkedSyncMap;
+import org.marid.typedmap.identity.wrapped.TypedWrappedMap;
 
 import java.util.Collections;
 import java.util.Map;
@@ -32,11 +33,11 @@ import java.util.function.Supplier;
  */
 interface TypedMapFactory {
 
-    static Supplier<TypedMutableMap<TestKey, Integer>> wrap(Supplier<Map<TestKey, Integer>> s) {
+    static Supplier<TypedMutableMap<TestKeyDomain, TestKey, Integer>> wrap(Supplier<Map<TestKey, Integer>> s) {
         return () -> new TypedWrappedMap<>(s.get());
     }
 
-    static Supplier<TypedMutableMap<TestKey, Integer>> byType(String type) {
+    static Supplier<TypedMutableMap<TestKeyDomain, TestKey, Integer>> byType(String type) {
         switch (type) {
             case "linked":
                 return TypedLinkedMap::new;

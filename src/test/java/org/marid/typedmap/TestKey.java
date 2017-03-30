@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TestKey implements Key<TestKey, Integer> {
+public class TestKey implements Key<TestKeyDomain, Integer> {
 
     private final Integer defaultValue;
 

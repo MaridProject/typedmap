@@ -13,9 +13,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap.linked;
+package org.marid.typedmap.identity.linked;
 
 import org.marid.typedmap.Key;
+import org.marid.typedmap.KeyDomain;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -24,7 +25,7 @@ import java.util.function.BiConsumer;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedLinkedSyncMap<K extends Key<K, V>, V> extends TypedLinkedMap<K, V> {
+public class TypedLinkedSyncMap<D extends KeyDomain, K extends Key<D, V>, V> extends TypedLinkedMap<D, K, V> {
 
     @Override
     public synchronized boolean containsValue(@Nonnull V value) {
@@ -38,13 +39,13 @@ public class TypedLinkedSyncMap<K extends Key<K, V>, V> extends TypedLinkedMap<K
 
     @Nullable
     @Override
-    public synchronized <KEY extends Key<KEY, VAL>, VAL extends V> VAL put(@Nonnull KEY key, @Nullable VAL value) {
+    public synchronized <VAL extends V> VAL put(@Nonnull Key<? super D, VAL> key, @Nullable VAL value) {
         return super.put(key, value);
     }
 
     @Nullable
     @Override
-    public synchronized <KEY extends Key<KEY, VAL>, VAL extends V> VAL get(@Nonnull KEY key) {
+    public synchronized <VAL extends V> VAL get(@Nonnull Key<? super D, VAL> key) {
         return super.get(key);
     }
 
@@ -54,12 +55,12 @@ public class TypedLinkedSyncMap<K extends Key<K, V>, V> extends TypedLinkedMap<K
     }
 
     @Override
-    public synchronized boolean isEmpty() {
-        return super.isEmpty();
+    public synchronized int size() {
+        return super.size();
     }
 
     @Override
-    public synchronized int size() {
-        return super.size();
+    public synchronized boolean isEmpty() {
+        return super.isEmpty();
     }
 }

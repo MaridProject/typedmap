@@ -19,6 +19,7 @@ import org.apache.commons.math3.util.Pair;
 import org.marid.typedmap.TestKey;
 import org.marid.typedmap.TestKeyDomain;
 import org.marid.typedmap.TypedMutableMap;
+import org.marid.typedmap.identity.array.TypedArrayMap;
 import org.marid.typedmap.identity.linked.TypedLinkedMap;
 import org.marid.typedmap.identity.wrapped.TypedWrappedMap;
 import org.testng.annotations.DataProvider;
@@ -41,7 +42,8 @@ public class TypedMapTest {
     private static final int ENTRY_SET_COUNT = 10;
     private static final List<Supplier<TypedMutableMap<TestKeyDomain, TestKey, Integer>>> MAP_SUPPLIERS = Arrays.asList(
             TypedWrappedMap::new,
-            TypedLinkedMap::new
+            TypedLinkedMap::new,
+            TypedArrayMap::new
     );
 
     @DataProvider

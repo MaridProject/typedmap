@@ -20,7 +20,6 @@ import org.marid.typedmap.TestKey;
 import org.marid.typedmap.TestKeyDomain;
 import org.marid.typedmap.TypedMutableMap;
 import org.marid.typedmap.identity.linked.TypedLinkedMap;
-import org.marid.typedmap.identity.linked.TypedLinkedSyncMap;
 import org.marid.typedmap.identity.wrapped.TypedWrappedMap;
 
 import java.util.Collections;
@@ -41,10 +40,6 @@ interface TypedMapFactory {
         switch (type) {
             case "linked":
                 return TypedLinkedMap::new;
-            case "fu":
-                return wrap(Object2ObjectOpenHashMap::new);
-            case "linkeds":
-                return TypedLinkedSyncMap::new;
             case "chash":
                 return wrap(ConcurrentHashMap::new);
             case "fus":

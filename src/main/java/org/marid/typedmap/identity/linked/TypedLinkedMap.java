@@ -15,8 +15,8 @@
 
 package org.marid.typedmap.identity.linked;
 
-import org.marid.typedmap.KeyDomain;
 import org.marid.typedmap.Key;
+import org.marid.typedmap.KeyDomain;
 import org.marid.typedmap.TypedMutableMap;
 
 import javax.annotation.Nonnull;
@@ -33,29 +33,29 @@ public class TypedLinkedMap<D extends KeyDomain, K extends Key<K, ? super D, ?>,
     private V value;
 
     @Override
-    public boolean containsKey(@Nonnull K key) {
+    public synchronized boolean containsKey(@Nonnull K key) {
         return key == this.key || next != null && next.containsKey(key);
     }
 
     @Override
-    public boolean containsValue(@Nonnull V value) {
+    public synchronized boolean containsValue(@Nonnull V value) {
         return this.value != null && this.value.equals(value) || next != null && next.containsValue(value);
     }
 
     @Override
-    public int size() {
+    public synchronized int size() {
         return key == null ? 0 : 1 + (next == null ? 0 : next.size());
     }
 
     @Override
-    public boolean isEmpty() {
+    public synchronized boolean isEmpty() {
         return key == null;
     }
 
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
-    public <VAL extends V> VAL get(@Nonnull Key<K, ? super D, VAL> key) {
+    public synchronized <VAL extends V> VAL get(@Nonnull Key<K, ? super D, VAL> key) {
         for (TypedLinkedMap<D, K, V> m = this; m != null; m = m.next) {
             if (m.key == key) {
                 return (VAL) m.value;
@@ -65,7 +65,7 @@ public class TypedLinkedMap<D extends KeyDomain, K extends Key<K, ? super D, ?>,
     }
 
     @Override
-    public void forEach(@Nonnull Class<D> domain, @Nonnull BiConsumer<K, V> consumer) {
+    public synchronized void forEach(@Nonnull Class<D> domain, @Nonnull BiConsumer<K, V> consumer) {
         for (TypedLinkedMap<D, K, V> m = this; m != null; m = m.next) {
             if (m.key != null) {
                 consumer.accept(m.key, m.value);
@@ -76,26 +76,23 @@ public class TypedLinkedMap<D extends KeyDomain, K extends Key<K, ? super D, ?>,
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
-    public <VAL extends V> VAL put(@Nonnull Key<K, ? super D, VAL> key, @Nullable VAL value) {
-        if (this.key == null) {
-            this.key = (K) key;
-            this.value = value;
-        } else {
-            for (TypedLinkedMap<D, K, V> m = this; m != null; m = m.next) {
-                if (m.key == key) {
-                    final V old = m.value;
-                    m.value = value;
-                    return (VAL) old;
-                }
+    public synchronized <VAL extends V> VAL put(@Nonnull Key<K, ? super D, VAL> key, @Nullable VAL value) {
+        for (TypedLinkedMap<D, K, V> m = this; ; m = m.next) {
+            if (m.key == null) {
+                m.key = (K) key;
+                m.value = value;
+                return null;
+            } else if (m.key == key) {
+                final V old = m.value;
+                m.value = value;
+                return (VAL) old;
+            } else if (m.next == null) {
+                final TypedLinkedMap<D, K, V> map = new TypedLinkedMap<>();
+                map.key = (K) key;
+                map.value = value;
+                m.next = map;
+                return null;
             }
-            final TypedLinkedMap<D, K, V> map = new TypedLinkedMap<>();
-            map.next = next;
-            map.key = this.key;
-            map.value = this.value;
-            this.key = (K) key;
-            this.value = value;
-            this.next = map;
         }
-        return null;
     }
 }

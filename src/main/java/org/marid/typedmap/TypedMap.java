@@ -22,7 +22,7 @@ import java.util.function.BiConsumer;
 /**
  * @author Dmitry Ovchinnikov
  */
-public interface TypedMap<D extends KeyDomain, K extends Key<D, V>, V> {
+public interface TypedMap<D extends KeyDomain, K extends Key<K, ? super D, ?>, V> {
 
     boolean containsKey(@Nonnull K key);
 
@@ -33,7 +33,7 @@ public interface TypedMap<D extends KeyDomain, K extends Key<D, V>, V> {
     boolean isEmpty();
 
     @Nullable
-    <VAL extends V> VAL get(@Nonnull Key<? super D, VAL> key);
+    <VAL extends V> VAL get(@Nonnull Key<K, ? super D, VAL> key);
 
-    void forEach(@Nonnull BiConsumer<K, V> consumer);
+    void forEach(@Nonnull Class<D> domain, @Nonnull BiConsumer<K, V> consumer);
 }

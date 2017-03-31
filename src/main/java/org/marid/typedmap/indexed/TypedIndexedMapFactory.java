@@ -13,28 +13,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap;
+package org.marid.typedmap.indexed;
 
-import javax.annotation.Nullable;
+import org.marid.typedmap.KeyDomain;
+import org.marid.typedmap.TypedMutableMap;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TestKey implements Key<TestKey, TestKeyDomain, Integer> {
+public interface TypedIndexedMapFactory {
 
-    private final Integer defaultValue;
-
-    public TestKey(Integer defaultValue) {
-        this.defaultValue = defaultValue;
-    }
-
-    public TestKey() {
-        this(null);
-    }
-
-    @Nullable
-    @Override
-    public Integer getDefault() {
-        return defaultValue;
+    static <D extends KeyDomain, K extends IndexedKey<K, ? super D, ?>, V> TypedMutableMap<D, K, V> create(Class<D> domain) {
+        final int keyCount = IndexedKey.getKeyCount(domain);
+        return keyCount < 256
+                ? new TypedIndexedKeyMap255<>()
+                : null;
     }
 }

@@ -15,17 +15,21 @@
 
 package org.marid.typedmap.indexed;
 
+import org.marid.typedmap.Key;
 import org.marid.typedmap.KeyDomain;
 
+import javax.annotation.Nullable;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-public class Key<D extends KeyDomain, T> {
+public class IndexedKey<K extends IndexedKey<K, ?, ?>, D extends KeyDomain, T> implements Key<K, D, T> {
 
     private static final ClassValue<DomainKeyDescriptor> DESCRIPTORS = new ClassValue<DomainKeyDescriptor>() {
         @Override
@@ -38,7 +42,7 @@ public class Key<D extends KeyDomain, T> {
     private final int index;
     private final Supplier<? extends T> defaultValueSupplier;
 
-    public Key(Class<D> domain, Supplier<? extends T> defaultValueSupplier) {
+    public IndexedKey(Class<D> domain, Supplier<? extends T> defaultValueSupplier) {
         this.domain = domain;
         this.index = DESCRIPTORS.get(domain).add(this);
         this.defaultValueSupplier = defaultValueSupplier;
@@ -56,25 +60,63 @@ public class Key<D extends KeyDomain, T> {
         return defaultValueSupplier;
     }
 
-    public T getDefaultValue() {
+    static int getKeyCount(Class<? extends KeyDomain> domain) {
+        final AtomicInteger c = new AtomicInteger();
+        walk(domain, d -> c.addAndGet(d.keys.size()));
+        return c.get();
+    }
+
+    @SuppressWarnings("unchecked")
+    static <K extends IndexedKey<K, ? super D, ?>, D extends KeyDomain> K getKey(Class<D> domain, int index) {
+        try {
+            walk(domain, d -> {
+                final Object o = d.byIndex.get(index);
+                if (o != null) {
+                    throw new Return(o);
+                }
+            });
+        } catch (Return r) {
+            return (K) r.key;
+        }
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public T getDefault() {
         return defaultValueSupplier.get();
     }
 
-    static int getKeyCount(Class<? extends KeyDomain> domain) {
-        return DESCRIPTORS.get(domain).keys.size() + Stream.of(domain.getInterfaces())
-                .mapToInt(c -> DESCRIPTORS.get(c).keys.size())
-                .sum();
+    private static void walk(Class<?> type, Consumer<DomainKeyDescriptor> consumer) {
+        for (Class<?> c = type; c != Object.class && c != null; c = c.getSuperclass()) {
+            consumer.accept(DESCRIPTORS.get(c));
+        }
+        for (final Class<?> c : type.getInterfaces()) {
+            consumer.accept(DESCRIPTORS.get(c));
+        }
     }
 
     private static class DomainKeyDescriptor {
 
         private final Map<Object, Class<?>> keys = new IdentityHashMap<>();
+        private final Map<Integer, Object> byIndex = new HashMap<>();
 
-        private synchronized int add(Key<? extends KeyDomain, ?> key) {
+        private synchronized int add(IndexedKey key) {
             final int size = keys.size();
             final Class<?> oldClass = keys.put(key, key.domain);
             assert oldClass == null : "Duplicated key for " + oldClass;
+            byIndex.put(key.getIndex(), key);
             return size;
+        }
+    }
+
+    private static class Return extends RuntimeException {
+
+        private final Object key;
+
+        private Return(Object key) {
+            super(null, null, false, false);
+            this.key = key;
         }
     }
 }

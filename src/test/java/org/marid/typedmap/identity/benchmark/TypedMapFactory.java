@@ -19,7 +19,6 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.marid.typedmap.TestKey;
 import org.marid.typedmap.TestKeyDomain;
 import org.marid.typedmap.TypedMutableMap;
-import org.marid.typedmap.identity.array.TypedArrayMap;
 import org.marid.typedmap.identity.linked.TypedLinkedMap;
 import org.marid.typedmap.identity.linked.TypedLinkedSyncMap;
 import org.marid.typedmap.identity.wrapped.TypedWrappedMap;
@@ -42,8 +41,6 @@ interface TypedMapFactory {
         switch (type) {
             case "linked":
                 return TypedLinkedMap::new;
-            case "array":
-                return TypedArrayMap::new;
             case "fu":
                 return wrap(Object2ObjectOpenHashMap::new);
             case "linkeds":

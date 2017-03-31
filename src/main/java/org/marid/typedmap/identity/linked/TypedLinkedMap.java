@@ -26,7 +26,7 @@ import java.util.function.BiConsumer;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedLinkedMap<D extends KeyDomain, K extends Key<D, V>, V> implements TypedMutableMap<D, K, V> {
+public class TypedLinkedMap<D extends KeyDomain, K extends Key<K, ? super D, ?>, V> implements TypedMutableMap<D, K, V> {
 
     private TypedLinkedMap<D, K, V> next;
     private K key;
@@ -55,7 +55,7 @@ public class TypedLinkedMap<D extends KeyDomain, K extends Key<D, V>, V> impleme
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
-    public <VAL extends V> VAL get(@Nonnull Key<? super D, VAL> key) {
+    public <VAL extends V> VAL get(@Nonnull Key<K, ? super D, VAL> key) {
         for (TypedLinkedMap<D, K, V> m = this; m != null; m = m.next) {
             if (m.key == key) {
                 return (VAL) m.value;
@@ -65,7 +65,7 @@ public class TypedLinkedMap<D extends KeyDomain, K extends Key<D, V>, V> impleme
     }
 
     @Override
-    public void forEach(@Nonnull BiConsumer<K, V> consumer) {
+    public void forEach(@Nonnull Class<D> domain, @Nonnull BiConsumer<K, V> consumer) {
         for (TypedLinkedMap<D, K, V> m = this; m != null; m = m.next) {
             if (m.key != null) {
                 consumer.accept(m.key, m.value);
@@ -76,7 +76,7 @@ public class TypedLinkedMap<D extends KeyDomain, K extends Key<D, V>, V> impleme
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
-    public <VAL extends V> VAL put(@Nonnull Key<? super D, VAL> key, @Nullable VAL value) {
+    public <VAL extends V> VAL put(@Nonnull Key<K, ? super D, VAL> key, @Nullable VAL value) {
         if (this.key == null) {
             this.key = (K) key;
             this.value = value;

@@ -15,8 +15,13 @@
 
 package org.marid.typedmap;
 
+import static java.util.concurrent.ThreadLocalRandom.current;
+import static java.util.stream.IntStream.range;
+
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TestKeyDomain implements KeyDomain {
+public interface TestKeyDomain extends KeyDomain {
+
+    TestKey[] TEST_KEYS = range(0, 255).mapToObj(i -> new TestKey(current().nextInt())).toArray(TestKey[]::new);
 }

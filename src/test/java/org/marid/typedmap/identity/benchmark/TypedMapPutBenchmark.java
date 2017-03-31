@@ -26,7 +26,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-import static org.marid.typedmap.identity.benchmark.TypedMapPutBenchmark.SIZE;
+import static org.marid.typedmap.identity.benchmark.ThreadState.SIZE;
 
 /**
  * @author Dmitry Ovchinnikov
@@ -39,8 +39,6 @@ import static org.marid.typedmap.identity.benchmark.TypedMapPutBenchmark.SIZE;
 @Threads(Threads.MAX)
 @Fork(value = 1, jvmArgs = {"-XX:+UseG1GC"})
 public class TypedMapPutBenchmark {
-
-    static final int SIZE = 50;
 
     @Benchmark
     public TypedMutableMap<TestKeyDomain, TestKey, Integer> put(ThreadState state, PutState putState) {

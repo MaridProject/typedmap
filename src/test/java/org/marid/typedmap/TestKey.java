@@ -15,26 +15,14 @@
 
 package org.marid.typedmap;
 
-import javax.annotation.Nullable;
+import org.marid.typedmap.indexed.IndexedKey;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TestKey implements Key<TestKey, TestKeyDomain, Integer> {
-
-    private final Integer defaultValue;
+public class TestKey extends IndexedKey<TestKey, TestKeyDomain, Integer> {
 
     public TestKey(Integer defaultValue) {
-        this.defaultValue = defaultValue;
-    }
-
-    public TestKey() {
-        this(null);
-    }
-
-    @Nullable
-    @Override
-    public Integer getDefault() {
-        return defaultValue;
+        super(TestKeyDomain.class, () -> defaultValue);
     }
 }

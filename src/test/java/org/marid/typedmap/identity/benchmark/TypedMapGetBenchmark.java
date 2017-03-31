@@ -27,7 +27,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
-import static org.marid.typedmap.identity.benchmark.TypedMapGetBenchmark.SIZE;
+import static org.marid.typedmap.identity.benchmark.ThreadState.SIZE;
 
 /**
  * @author Dmitry Ovchinnikov
@@ -40,8 +40,6 @@ import static org.marid.typedmap.identity.benchmark.TypedMapGetBenchmark.SIZE;
 @Threads(Threads.MAX)
 @Fork(value = 1, jvmArgs = {"-XX:+UseG1GC"})
 public class TypedMapGetBenchmark {
-
-    static final int SIZE = 50;
 
     @Benchmark
     public int get(GetState getState) {

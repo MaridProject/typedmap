@@ -16,9 +16,11 @@
 package org.marid.typedmap.identity.benchmark;
 
 import org.marid.typedmap.TestKey;
+import org.marid.typedmap.TestKeyDomain;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -27,7 +29,9 @@ import java.util.Random;
 @State(Scope.Thread)
 public class ThreadState {
 
+    static final int SIZE = 50;
+
     final Random random = new Random(0);
-    final TestKey[] keys = random.ints().limit(TypedMapGetBenchmark.SIZE).mapToObj(TestKey::new).toArray(TestKey[]::new);
-    final Integer[] values = random.ints().limit(TypedMapGetBenchmark.SIZE).boxed().toArray(Integer[]::new);
+    final TestKey[] keys = Arrays.copyOf(TestKeyDomain.TEST_KEYS, SIZE);
+    final Integer[] values = random.ints().limit(SIZE).boxed().toArray(Integer[]::new);
 }

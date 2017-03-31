@@ -26,9 +26,9 @@ import java.util.function.BiConsumer;
 /**
  * @author Dmitry Ovchinnikov
  */
-class TypedIndexedKeyMap255<D extends KeyDomain, K extends IndexedKey<K, ? super D, ?>, V> implements TypedMutableMap<D, K, V> {
+public class TypedIndexedKeyMap255<D extends KeyDomain, K extends IndexedKey<K, ? super D, ?>, V> implements TypedMutableMap<D, K, V> {
 
-    private long state;
+    private volatile long state;
 
     private V v0;
     private V v1;
@@ -45,7 +45,7 @@ class TypedIndexedKeyMap255<D extends KeyDomain, K extends IndexedKey<K, ? super
     public boolean containsKey(@Nonnull K key) {
         for (TypedIndexedKeyMap255<D, K, V> m = this; m != null; m = m.next) {
             synchronized (m) {
-                final int index = find(key.getIndex(), m.state, m.size());
+                final int index = find(key.getIndex() + 1, m.state, m.size());
                 if (index >= 0) {
                     return true;
                 }
@@ -86,7 +86,7 @@ class TypedIndexedKeyMap255<D extends KeyDomain, K extends IndexedKey<K, ? super
     public <VAL extends V> VAL get(@Nonnull Key<K, ? super D, VAL> key) {
         for (TypedIndexedKeyMap255<D, K, V> m = this; m != null; m = m.next) {
             synchronized (m) {
-                final int index = find(key.getKey().getIndex(), m.state, m.size());
+                final int index = find(key.getKey().getIndex() + 1, m.state, m.size());
                 if (index >= 0) {
                     return (VAL) getValue(index);
                 }
@@ -120,14 +120,10 @@ class TypedIndexedKeyMap255<D extends KeyDomain, K extends IndexedKey<K, ? super
         for (TypedIndexedKeyMap255<D, K, V> m = this; m != null; m = m.next) {
             synchronized (m) {
                 final int n = m.size();
-                final long v = m.state;
-                for (int i = 0; i < n; i++) {
-                    final int keyIndex = key(v, i) - 1;
-                    if (keyIndex == key.getKey().getIndex()) {
-                        return (VAL) setValue(i, key.getKey(), value);
-                    }
-                }
-                if (m.next == null) {
+                final int index = find(key.getKey().getIndex(), m.state, m.size());
+                if (index >= 0) {
+                    return (VAL) setValue(index, key.getKey(), value);
+                } else if (m.next == null) {
                     if (n < 8) {
                         return (VAL) setValue(n, key.getKey(), value);
                     } else {

@@ -13,14 +13,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap.identity;
+package org.marid.typedmap;
 
 import org.apache.commons.math3.util.Pair;
-import org.marid.typedmap.TestKey;
-import org.marid.typedmap.TestKeyDomain;
-import org.marid.typedmap.TypedMutableMap;
 import org.marid.typedmap.identity.linked.TypedLinkedMap;
 import org.marid.typedmap.identity.wrapped.TypedWrappedMap;
+import org.marid.typedmap.indexed.TypedIndexedKeyMap255;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -37,25 +35,24 @@ import static org.testng.Assert.assertEquals;
  */
 public class TypedMapTest {
 
-    private static final int ENTRY_COUNT = 77;
+    private static final int ENTRY_COUNT = 20;
     private static final int ENTRY_SET_COUNT = 10;
     private static final List<Supplier<TypedMutableMap<TestKeyDomain, TestKey, Integer>>> MAP_SUPPLIERS = Arrays.asList(
             TypedWrappedMap::new,
-            TypedLinkedMap::new
+            TypedLinkedMap::new,
+            TypedIndexedKeyMap255::new
     );
 
     @DataProvider
     public Object[][] setsOfEntries() {
-        final List<TestKey> keys = IntStream.range(0, ENTRY_SET_COUNT * ENTRY_COUNT)
-                .mapToObj(TestKey::new)
-                .collect(Collectors.toList());
+        final TestKey[] keys = Arrays.copyOf(TestKeyDomain.TEST_KEYS, ENTRY_COUNT * ENTRY_SET_COUNT);
         return MAP_SUPPLIERS.stream()
                 .flatMap(s -> IntStream.range(0, ENTRY_SET_COUNT)
                         .mapToObj(i -> {
                             final Random random = new Random(1000L * i);
                             return IntStream.range(0, ENTRY_COUNT)
                                     .mapToObj(k -> {
-                                        final TestKey key = keys.get(random.nextInt(keys.size()));
+                                        final TestKey key = keys[random.nextInt(keys.length)];
                                         final Integer value = random.nextInt();
                                         return new Pair<>(key, value);
                                     })

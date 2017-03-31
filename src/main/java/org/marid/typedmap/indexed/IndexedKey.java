@@ -60,6 +60,11 @@ public class IndexedKey<K extends IndexedKey<K, ?, ?>, D extends KeyDomain, T> i
         return defaultValueSupplier;
     }
 
+    @Override
+    public String toString() {
+        return "IndexedKey(" + index + ")";
+    }
+
     static int getKeyCount(Class<? extends KeyDomain> domain) {
         final AtomicInteger c = new AtomicInteger();
         walk(domain, d -> c.addAndGet(d.keys.size()));
@@ -98,15 +103,16 @@ public class IndexedKey<K extends IndexedKey<K, ?, ?>, D extends KeyDomain, T> i
 
     private static class DomainKeyDescriptor {
 
+        private final AtomicInteger counter = new AtomicInteger();
         private final Map<Object, Class<?>> keys = new IdentityHashMap<>();
         private final Map<Integer, Object> byIndex = new HashMap<>();
 
         private synchronized int add(IndexedKey key) {
-            final int size = keys.size();
+            final int id = counter.getAndIncrement();
             final Class<?> oldClass = keys.put(key, key.domain);
             assert oldClass == null : "Duplicated key for " + oldClass;
-            byIndex.put(key.getIndex(), key);
-            return size;
+            byIndex.put(id, key);
+            return id;
         }
     }
 

@@ -33,29 +33,39 @@ public class TypedLinkedMap<D extends KeyDomain, K extends Key<K, ? super D, ?>,
     private V value;
 
     @Override
-    public synchronized boolean containsKey(@Nonnull K key) {
-        return key == this.key || next != null && next.containsKey(key);
+    public boolean containsKey(@Nonnull K key) {
+        for (TypedLinkedMap<D, K, V> m = this; m != null; m = m.next) {
+            if (m.key == key) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
-    public synchronized boolean containsValue(@Nonnull V value) {
-        return this.value != null && this.value.equals(value) || next != null && next.containsValue(value);
+    public boolean containsValue(@Nonnull V value) {
+        for (TypedLinkedMap<D, K, V> m = this; m != null; m = m.next) {
+            if (m.value != null && m.value.equals(value)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
-    public synchronized int size() {
+    public int size() {
         return key == null ? 0 : 1 + (next == null ? 0 : next.size());
     }
 
     @Override
-    public synchronized boolean isEmpty() {
+    public boolean isEmpty() {
         return key == null;
     }
 
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
-    public synchronized <VAL extends V> VAL get(@Nonnull Key<K, ? super D, VAL> key) {
+    public <VAL extends V> VAL get(@Nonnull Key<K, ? super D, VAL> key) {
         for (TypedLinkedMap<D, K, V> m = this; m != null; m = m.next) {
             if (m.key == key) {
                 return (VAL) m.value;
@@ -65,7 +75,7 @@ public class TypedLinkedMap<D extends KeyDomain, K extends Key<K, ? super D, ?>,
     }
 
     @Override
-    public synchronized void forEach(@Nonnull Class<D> domain, @Nonnull BiConsumer<K, V> consumer) {
+    public void forEach(@Nonnull Class<D> domain, @Nonnull BiConsumer<K, V> consumer) {
         for (TypedLinkedMap<D, K, V> m = this; m != null; m = m.next) {
             if (m.key != null) {
                 consumer.accept(m.key, m.value);
@@ -76,7 +86,7 @@ public class TypedLinkedMap<D extends KeyDomain, K extends Key<K, ? super D, ?>,
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
-    public synchronized <VAL extends V> VAL put(@Nonnull Key<K, ? super D, VAL> key, @Nullable VAL value) {
+    public <VAL extends V> VAL put(@Nonnull Key<K, ? super D, VAL> key, @Nullable VAL value) {
         for (TypedLinkedMap<D, K, V> m = this; ; m = m.next) {
             if (m.key == null) {
                 m.key = (K) key;

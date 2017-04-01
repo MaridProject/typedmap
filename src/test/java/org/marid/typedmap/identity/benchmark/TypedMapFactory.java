@@ -21,7 +21,7 @@ import org.marid.typedmap.TestKeyDomain;
 import org.marid.typedmap.TypedMutableMap;
 import org.marid.typedmap.identity.linked.TypedLinkedSyncMap;
 import org.marid.typedmap.identity.wrapped.TypedWrappedMap;
-import org.marid.typedmap.indexed.TypedIndexedByteKeyMap;
+import org.marid.typedmap.indexed.TypedIndexedByteKeySyncMap;
 
 import java.util.Collections;
 import java.util.Map;
@@ -46,7 +46,7 @@ interface TypedMapFactory {
             case "fus":
                 return wrap(() -> Collections.synchronizedMap(new Object2ObjectOpenHashMap<>()));
             case "i255":
-                return TypedIndexedByteKeyMap::new;
+                return TypedIndexedByteKeySyncMap::new;
             default:
                 throw new IllegalArgumentException(type);
         }

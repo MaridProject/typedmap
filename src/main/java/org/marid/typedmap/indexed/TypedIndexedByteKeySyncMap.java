@@ -13,7 +13,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap.identity.linked;
+package org.marid.typedmap.indexed;
 
 import org.marid.typedmap.Key;
 import org.marid.typedmap.KeyDomain;
@@ -25,8 +25,8 @@ import java.util.function.BiConsumer;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedLinkedSyncMap<D extends KeyDomain, K extends Key<K, ? super D, ? extends V>, V>
-        extends TypedLinkedMap<D, K, V> {
+public class TypedIndexedByteKeySyncMap<D extends KeyDomain, K extends IndexedKey<K, ? super D, ? extends V>, V>
+        extends TypedIndexedByteKeyMap<D, K, V> {
 
     @Override
     public synchronized boolean containsValue(@Nonnull V value) {

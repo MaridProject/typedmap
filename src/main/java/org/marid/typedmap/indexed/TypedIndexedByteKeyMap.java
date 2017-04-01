@@ -42,10 +42,18 @@ public class TypedIndexedByteKeyMap<D extends KeyDomain, K extends IndexedKey<K,
 
     private TypedIndexedByteKeyMap<D, K, V> next;
 
+    public TypedIndexedByteKeyMap() {
+    }
+
+    private TypedIndexedByteKeyMap(Key<K, ?, ?> key, V val) {
+        state = key.getOrder() + 1;
+        v0 = val;
+    }
+
     @Override
     public boolean containsKey(@Nonnull K key) {
         for (TypedIndexedByteKeyMap<D, K, V> m = this; m != null; m = m.next) {
-            final int index = find(key.getIndex() + 1, m.state, m.size());
+            final int index = find(key.getOrder() + 1, m.state, m.size());
             if (index >= 0) {
                 return true;
             }
@@ -77,13 +85,14 @@ public class TypedIndexedByteKeyMap<D extends KeyDomain, K extends IndexedKey<K,
         return state == 0;
     }
 
+    @SuppressWarnings("unchecked")
     @Nullable
     @Override
     public <VAL extends V> VAL get(@Nonnull Key<K, ? super D, VAL> key) {
         for (TypedIndexedByteKeyMap<D, K, V> m = this; m != null; m = m.next) {
-            final int index = find(key.getKey().getIndex() + 1, m.state, m.size());
+            final int index = find(key.getOrder() + 1, m.state, m.size());
             if (index >= 0) {
-                return m.getValue(index);
+                return (VAL) m.getValue(index);
             }
         }
         return null;
@@ -109,7 +118,7 @@ public class TypedIndexedByteKeyMap<D extends KeyDomain, K extends IndexedKey<K,
         for (TypedIndexedByteKeyMap<D, K, V> m = this; ; m = m.next) {
             final int n = m.size();
             final long v = m.state;
-            final int index = find(key.getKey().getIndex() + 1, v, m.size());
+            final int index = find(key.getOrder() + 1, v, n);
             if (index >= 0) {
                 return m.setValue(index, key, value);
             } else if (m.next == null) {
@@ -118,90 +127,66 @@ public class TypedIndexedByteKeyMap<D extends KeyDomain, K extends IndexedKey<K,
                     for (int i = n; i > pos; i--) {
                         m.setValue(i, key(v, i - 1), m.getValue(i - 1));
                     }
-                    m.setValue(pos, key.getKey().getIndex() + 1, value);
-                    return null;
+                    m.setValue(pos, key.getOrder() + 1, value);
                 } else {
-                    final TypedIndexedByteKeyMap<D, K, V> next = new TypedIndexedByteKeyMap<>();
-                    next.setValue(0, key.getKey().getIndex() + 1, value);
-                    m.next = next;
-                    return null;
+                    m.next = new TypedIndexedByteKeyMap<>(key, value);
                 }
+                return null;
             }
         }
     }
 
     @SuppressWarnings("unchecked")
-    private <VAL extends V> VAL getValue(int index) {
+    private V getValue(int index) {
         switch (index) {
-            case 0:
-                return (VAL) v0;
-            case 1:
-                return (VAL) v1;
-            case 2:
-                return (VAL) v2;
-            case 3:
-                return (VAL) v3;
-            case 4:
-                return (VAL) v4;
-            case 5:
-                return (VAL) v5;
-            case 6:
-                return (VAL) v6;
-            case 7:
-                return (VAL) v7;
-            default:
-                throw new IndexOutOfBoundsException(Integer.toString(index));
+            case 0: return v0;
+            case 1: return v1;
+            case 2: return v2;
+            case 3: return v3;
+            case 4: return v4;
+            case 5: return v5;
+            case 6: return v6;
+            case 7: return v7;
+            default: throw new IndexOutOfBoundsException(Integer.toString(index));
         }
     }
 
     private void setValue(int index, int key, V value) {
         switch (index) {
-            case 0:
-                v0 = value;
-                break;
-            case 1:
-                v1 = value;
-                break;
-            case 2:
-                v2 = value;
-                break;
-            case 3:
-                v3 = value;
-                break;
-            case 4:
-                v4 = value;
-                break;
-            case 5:
-                v5 = value;
-                break;
-            case 6:
-                v6 = value;
-                break;
-            case 7:
-                v7 = value;
-                break;
-            default:
-                throw new IndexOutOfBoundsException(Integer.toString(index));
+            case 0: v0 = value; break;
+            case 1: v1 = value; break;
+            case 2: v2 = value; break;
+            case 3: v3 = value; break;
+            case 4: v4 = value; break;
+            case 5: v5 = value; break;
+            case 6: v6 = value; break;
+            case 7: v7 = value; break;
+            default: throw new IndexOutOfBoundsException(Integer.toString(index));
         }
-        final long mask;
-        switch (index) {
-            case 0:
-                mask = -1L << 8;
-                break;
-            case 7:
-                mask = -1L >>> 8;
-                break;
-            default:
-                mask = (-1L << (index + 1) * 8) | (-1L >>> (8 - index) * 8);
-                break;
-        }
+        updateState(index, key);
+    }
+
+    private void updateState(int index, int key) {
+        final long mask = index == 0 ? -1L << 8 : (-1L << (index + 1) * 8) | (-1L >>> (8 - index) * 8);
         state = (state & mask) | ((long) key << 8 * index);
     }
 
+    @SuppressWarnings("unchecked")
     private <VAL extends V> VAL setValue(int index, Key<K, ? super D, VAL> key, VAL value) {
-        final VAL old = getValue(index);
-        setValue(index, key.getKey().getIndex() + 1, value);
-        return old;
+        final V old;
+        switch (index) {
+            case 0: old = v0; v0 = value; break;
+            case 1: old = v1; v1 = value; break;
+            case 2: old = v2; v2 = value; break;
+            case 3: old = v3; v3 = value; break;
+            case 4: old = v4; v4 = value; break;
+            case 5: old = v5; v5 = value; break;
+            case 6: old = v6; v6 = value; break;
+            case 7: old = v7; v7 = value; break;
+            default: throw new IndexOutOfBoundsException(Integer.toString(index));
+        }
+        updateState(index, key.getOrder() + 1);
+        return (VAL) old;
     }
 
     private static int key(long v, int index) {

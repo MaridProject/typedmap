@@ -93,28 +93,39 @@ public class TypedLinkedMap<D extends KeyDomain, K extends Key<K, ? super D, ?>,
     @Nullable
     @Override
     public <VAL extends V> VAL put(@Nonnull Key<K, ? super D, VAL> key, @Nullable VAL value) {
-        for (TypedLinkedMap<D, K, V> m = this; ; m = m.next) {
-            if (m.key == null) {
-                m.key = (K) key;
-                m.value = value;
-                return null;
-            } else if (m.key == key) {
-                final V old = m.value;
-                m.value = value;
-                return (VAL) old;
-            } else if (m.next != null && m.next.key.getOrder() > key.getOrder()) {
-                final TypedLinkedMap<D, K, V> map = new TypedLinkedMap<>();
-                map.key = (K) key;
-                map.value = value;
-                map.next = m.next;
-                m.next = map;
-                return null;
-            } else if (m.next == null) {
-                final TypedLinkedMap<D, K, V> map = new TypedLinkedMap<>();
-                map.key = (K) key;
-                map.value = value;
-                m.next = map;
-                return null;
+        if (this.key == null) {
+            this.key = (K) key;
+            this.value = value;
+            return null;
+        } else if (this.key.getOrder() > key.getOrder()) {
+            final TypedLinkedMap<D, K, V> map = new TypedLinkedMap<>();
+            map.key = this.key;
+            map.value = this.value;
+            map.next = this.next;
+            this.key = key.getKey();
+            this.value = value;
+            this.next = map;
+            return null;
+        } else {
+            for (TypedLinkedMap<D, K, V> m = this; ; m = m.next) {
+                if (m.key == key) {
+                    final V old = m.value;
+                    m.value = value;
+                    return (VAL) old;
+                } else if (m.next == null) {
+                    final TypedLinkedMap<D, K, V> map = new TypedLinkedMap<>();
+                    map.key = (K) key;
+                    map.value = value;
+                    m.next = map;
+                    return null;
+                } else if (m.next.key.getOrder() > key.getOrder()) {
+                    final TypedLinkedMap<D, K, V> map = new TypedLinkedMap<>();
+                    map.key = (K) key;
+                    map.value = value;
+                    map.next = m.next;
+                    m.next = map;
+                    return null;
+                }
             }
         }
     }

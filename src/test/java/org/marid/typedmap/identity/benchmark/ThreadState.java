@@ -30,7 +30,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @State(Scope.Thread)
 public class ThreadState {
 
-    static final int SIZE = 99;
+    static final int SIZE = 64;
 
     final TestKey[] keys = Arrays.copyOf(TestKeyDomain.TEST_KEYS, SIZE);
     final Integer[] values = ThreadLocalRandom.current().ints().limit(SIZE).boxed().toArray(Integer[]::new);

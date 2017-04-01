@@ -25,8 +25,8 @@ import java.util.function.BiConsumer;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedIndexedByteKeySyncMap<D extends KeyDomain, K extends IndexedKey<K, ? super D, ? extends V>, V>
-        extends TypedIndexedByteKeyMap<D, K, V> {
+public class TypedIndexed8KeySyncMap<D extends KeyDomain, K extends IndexedKey<K, ? super D, ? extends V>, V>
+        extends TypedIndexed8KeyMap<D, K, V> {
 
     @Override
     public synchronized boolean containsValue(@Nonnull V value) {

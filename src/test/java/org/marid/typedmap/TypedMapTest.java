@@ -18,7 +18,8 @@ package org.marid.typedmap;
 import org.apache.commons.math3.util.Pair;
 import org.marid.typedmap.identity.linked.TypedLinkedMap;
 import org.marid.typedmap.identity.wrapped.TypedWrappedMap;
-import org.marid.typedmap.indexed.TypedIndexedByteKeyMap;
+import org.marid.typedmap.indexed.TypedIndexed16KeyMap;
+import org.marid.typedmap.indexed.TypedIndexed8KeyMap;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -40,7 +41,8 @@ public class TypedMapTest {
     private static final List<Supplier<TypedMutableMap<TestKeyDomain, TestKey, Integer>>> MAP_SUPPLIERS = Arrays.asList(
             TypedWrappedMap::new,
             TypedLinkedMap::new,
-            TypedIndexedByteKeyMap::new
+            TypedIndexed8KeyMap::new,
+            TypedIndexed16KeyMap::new
     );
 
     @DataProvider

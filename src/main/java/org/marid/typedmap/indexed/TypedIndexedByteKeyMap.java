@@ -167,8 +167,8 @@ public class TypedIndexedByteKeyMap<D extends KeyDomain, K extends IndexedKey<K,
     }
 
     private void updateState(int index, int key) {
-        final long mask = index == 0 ? -1L << 8 : (-1L << (index + 1) * 8) | (-1L >>> (8 - index) * 8);
-        state = (state & mask) | ((long) key << 8 * index);
+        final int offset = index * 8;
+        state = (state & ~(0xFFL << offset)) | ((long) key << offset);
     }
 
     @SuppressWarnings("unchecked")

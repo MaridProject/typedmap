@@ -19,9 +19,9 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.marid.typedmap.TestKey;
 import org.marid.typedmap.TestKeyDomain;
 import org.marid.typedmap.TypedMutableMap;
-import org.marid.typedmap.identity.linked.TypedLinkedMap;
+import org.marid.typedmap.identity.linked.TypedLinkedSyncMap;
 import org.marid.typedmap.identity.wrapped.TypedWrappedMap;
-import org.marid.typedmap.indexed.TypedIndexedKeyMap255;
+import org.marid.typedmap.indexed.TypedIndexedByteKeyMap;
 
 import java.util.Collections;
 import java.util.Map;
@@ -40,13 +40,13 @@ interface TypedMapFactory {
     static Supplier<TypedMutableMap<TestKeyDomain, TestKey, Integer>> byType(String type) {
         switch (type) {
             case "linked":
-                return TypedLinkedMap::new;
+                return TypedLinkedSyncMap::new;
             case "chash":
                 return wrap(ConcurrentHashMap::new);
             case "fus":
                 return wrap(() -> Collections.synchronizedMap(new Object2ObjectOpenHashMap<>()));
             case "i255":
-                return TypedIndexedKeyMap255::new;
+                return TypedIndexedByteKeyMap::new;
             default:
                 throw new IllegalArgumentException(type);
         }

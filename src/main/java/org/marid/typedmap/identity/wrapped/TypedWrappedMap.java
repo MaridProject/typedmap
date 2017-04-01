@@ -28,7 +28,8 @@ import java.util.function.BiConsumer;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedWrappedMap<D extends KeyDomain, K extends Key<K, ? super D, V>, V> implements TypedMutableMap<D, K, V> {
+public class TypedWrappedMap<D extends KeyDomain, K extends Key<K, ? super D, ? extends V>, V>
+        implements TypedMutableMap<D, K, V> {
 
     private final Map<K, V> delegate;
 

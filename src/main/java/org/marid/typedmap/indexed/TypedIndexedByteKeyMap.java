@@ -26,7 +26,8 @@ import java.util.function.BiConsumer;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedIndexedKeyMap255<D extends KeyDomain, K extends IndexedKey<K, ? super D, ?>, V> implements TypedMutableMap<D, K, V> {
+public class TypedIndexedByteKeyMap<D extends KeyDomain, K extends IndexedKey<K, ? super D, ? extends V>, V>
+        implements TypedMutableMap<D, K, V> {
 
     private long state;
 
@@ -39,11 +40,11 @@ public class TypedIndexedKeyMap255<D extends KeyDomain, K extends IndexedKey<K, 
     private V v6;
     private V v7;
 
-    private TypedIndexedKeyMap255<D, K, V> next;
+    private TypedIndexedByteKeyMap<D, K, V> next;
 
     @Override
     public boolean containsKey(@Nonnull K key) {
-        for (TypedIndexedKeyMap255<D, K, V> m = this; m != null; m = m.next) {
+        for (TypedIndexedByteKeyMap<D, K, V> m = this; m != null; m = m.next) {
             final int index = find(key.getIndex() + 1, m.state, m.size());
             if (index >= 0) {
                 return true;
@@ -54,7 +55,7 @@ public class TypedIndexedKeyMap255<D extends KeyDomain, K extends IndexedKey<K, 
 
     @Override
     public boolean containsValue(@Nonnull V value) {
-        for (TypedIndexedKeyMap255<D, K, V> m = this; m != null; m = m.next) {
+        for (TypedIndexedByteKeyMap<D, K, V> m = this; m != null; m = m.next) {
             final int n = m.size();
             for (int i = 0; i < n; i++) {
                 final V val = m.getValue(i);
@@ -79,7 +80,7 @@ public class TypedIndexedKeyMap255<D extends KeyDomain, K extends IndexedKey<K, 
     @Nullable
     @Override
     public <VAL extends V> VAL get(@Nonnull Key<K, ? super D, VAL> key) {
-        for (TypedIndexedKeyMap255<D, K, V> m = this; m != null; m = m.next) {
+        for (TypedIndexedByteKeyMap<D, K, V> m = this; m != null; m = m.next) {
             final int index = find(key.getKey().getIndex() + 1, m.state, m.size());
             if (index >= 0) {
                 return m.getValue(index);
@@ -90,7 +91,7 @@ public class TypedIndexedKeyMap255<D extends KeyDomain, K extends IndexedKey<K, 
 
     @Override
     public void forEach(@Nonnull Class<D> domain, @Nonnull BiConsumer<K, V> consumer) {
-        for (TypedIndexedKeyMap255<D, K, V> m = this; m != null; m = m.next) {
+        for (TypedIndexedByteKeyMap<D, K, V> m = this; m != null; m = m.next) {
             final int n = m.size();
             final long v = m.state;
             for (int i = 0; i < n; i++) {
@@ -105,7 +106,7 @@ public class TypedIndexedKeyMap255<D extends KeyDomain, K extends IndexedKey<K, 
     @Nullable
     @Override
     public <VAL extends V> VAL put(@Nonnull Key<K, ? super D, VAL> key, @Nullable VAL value) {
-        for (TypedIndexedKeyMap255<D, K, V> m = this; ; m = m.next) {
+        for (TypedIndexedByteKeyMap<D, K, V> m = this; ; m = m.next) {
             final int n = m.size();
             final long v = m.state;
             final int index = find(key.getKey().getIndex() + 1, v, m.size());
@@ -120,7 +121,7 @@ public class TypedIndexedKeyMap255<D extends KeyDomain, K extends IndexedKey<K, 
                     m.setValue(pos, key.getKey().getIndex() + 1, value);
                     return null;
                 } else {
-                    final TypedIndexedKeyMap255<D, K, V> next = new TypedIndexedKeyMap255<>();
+                    final TypedIndexedByteKeyMap<D, K, V> next = new TypedIndexedByteKeyMap<>();
                     next.setValue(0, key.getKey().getIndex() + 1, value);
                     m.next = next;
                     return null;

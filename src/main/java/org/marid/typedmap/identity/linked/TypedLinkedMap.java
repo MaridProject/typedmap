@@ -21,14 +21,12 @@ import org.marid.typedmap.TypedMutableMap;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.function.BiConsumer;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedLinkedMap<D extends KeyDomain, K extends Key<K, ? super D, ?>, V> implements TypedMutableMap<D, K, V> {
+public class TypedLinkedMap<D extends KeyDomain, K extends Key<K, ? super D, ? extends V>, V> implements TypedMutableMap<D, K, V> {
 
     private TypedLinkedMap<D, K, V> next;
     private K key;
@@ -128,16 +126,5 @@ public class TypedLinkedMap<D extends KeyDomain, K extends Key<K, ? super D, ?>,
                 }
             }
         }
-    }
-
-    @Override
-    public String toString() {
-        final Map<K, V> map = new LinkedHashMap<>();
-        for (TypedLinkedMap<D, K, V> m = this; m != null; m = m.next) {
-            if (m.key != null) {
-                map.put(m.key, m.value);
-            }
-        }
-        return TypedLinkedMap.class.getSimpleName() + map;
     }
 }

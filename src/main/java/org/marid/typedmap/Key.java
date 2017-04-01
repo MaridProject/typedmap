@@ -15,12 +15,13 @@
 
 package org.marid.typedmap;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-public interface Key<K extends Key<K, ?, ?>, D extends KeyDomain, T> {
+public interface Key<K extends Key<K, ?, ?>, D extends KeyDomain, T> extends Comparable<Key<K, ?, ?>> {
 
     @Nullable
     T getDefault();
@@ -28,5 +29,14 @@ public interface Key<K extends Key<K, ?, ?>, D extends KeyDomain, T> {
     @SuppressWarnings("unchecked")
     default K getKey() {
         return (K) this;
+    }
+
+    @Override
+    default int compareTo(@Nonnull Key<K, ?, ?> o) {
+        return System.identityHashCode(this) - System.identityHashCode(o);
+    }
+
+    default int getOrder() {
+        return System.identityHashCode(this);
     }
 }

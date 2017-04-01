@@ -50,6 +50,11 @@ public class IndexedKey<K extends IndexedKey<K, ?, ?>, D extends KeyDomain, T> i
         return index;
     }
 
+    @Override
+    public final int getOrder() {
+        return index;
+    }
+
     public Class<D> getDomain() {
         return domain;
     }
@@ -59,8 +64,13 @@ public class IndexedKey<K extends IndexedKey<K, ?, ?>, D extends KeyDomain, T> i
     }
 
     @Override
+    public int compareTo(@Nonnull Key<K, ?, ?> o) {
+        return getOrder() - o.getOrder();
+    }
+
+    @Override
     public String toString() {
-        return "IndexedKey(" + index + ")";
+        return "IndexedKey(" + System.identityHashCode(this) + "@" + index + ")";
     }
 
     @SuppressWarnings("unchecked")

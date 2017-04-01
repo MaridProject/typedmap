@@ -15,13 +15,14 @@
 
 package org.marid.typedmap.identity.benchmark;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrays;
 import org.marid.typedmap.TestKey;
 import org.marid.typedmap.TestKeyDomain;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 
 import java.util.Arrays;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author Dmitry Ovchinnikov
@@ -29,9 +30,12 @@ import java.util.Random;
 @State(Scope.Thread)
 public class ThreadState {
 
-    static final int SIZE = 48;
+    static final int SIZE = 64;
 
-    final Random random = new Random(0);
     final TestKey[] keys = Arrays.copyOf(TestKeyDomain.TEST_KEYS, SIZE);
-    final Integer[] values = random.ints().limit(SIZE).boxed().toArray(Integer[]::new);
+    final Integer[] values = ThreadLocalRandom.current().ints().limit(SIZE).boxed().toArray(Integer[]::new);
+
+    public ThreadState() {
+        ObjectArrays.shuffle(keys, ThreadLocalRandom.current());
+    }
 }

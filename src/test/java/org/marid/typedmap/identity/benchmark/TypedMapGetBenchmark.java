@@ -23,29 +23,37 @@ import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 import static org.marid.typedmap.identity.benchmark.ThreadState.SIZE;
+import static org.marid.typedmap.identity.benchmark.TypedMapGetBenchmark.KEY_ARRAY_COUNT;
 
 /**
  * @author Dmitry Ovchinnikov
  */
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @BenchmarkMode(Mode.AverageTime)
-@OperationsPerInvocation(100_000 * SIZE)
-@Warmup(iterations = 5, batchSize = 100_000)
-@Measurement(iterations = 5, batchSize = 100_000)
+@OperationsPerInvocation(KEY_ARRAY_COUNT * SIZE)
+@Warmup(iterations = 5)
+@Measurement(iterations = 5)
 @Threads(Threads.MAX)
-@Fork(value = 1, jvmArgs = {"-XX:+UseG1GC"})
+@Fork(value = 3, jvmArgs = {"-XX:+UseG1GC"})
 public class TypedMapGetBenchmark {
+
+    static final int KEY_ARRAY_COUNT = 1_000;
 
     @Benchmark
     public int get(GetState getState) {
         int s = 0;
-        for (int i = 0; i < SIZE; i++) {
-            s ^= Objects.hashCode(getState.map.get(getState.keys[i]));
+        final TypedMutableMap<TestKeyDomain, TestKey, Integer> map = getState.map;
+        for (final TestKey[] testKeys : getState.keys) {
+            for (final TestKey testKey : testKeys) {
+                s ^= Objects.hashCode(map.get(testKey));
+            }
         }
         return s;
     }
@@ -60,19 +68,27 @@ public class TypedMapGetBenchmark {
     @State(Scope.Thread)
     public static class GetState {
 
-        final TestKey[] keys = new TestKey[SIZE];
+        final TestKey[][] keys = new TestKey[KEY_ARRAY_COUNT][SIZE];
 
         @Param({"linked", "i255", "chash", "fus"})
         private String type;
 
         TypedMutableMap<TestKeyDomain, TestKey, Integer> map;
 
-        @Setup
+        @Setup(Level.Trial)
         public void init(ThreadState state) {
-            System.arraycopy(state.keys, 0, keys, 0, keys.length);
+            for (int i = 0; i < KEY_ARRAY_COUNT; i++) {
+                System.arraycopy(state.keys, 0, keys[i], 0, keys[i].length);
+                ObjectArrays.shuffle(keys[i], ThreadLocalRandom.current());
+            }
+        }
+
+        @Setup(Level.Invocation)
+        public void initMap(ThreadState state) {
+            final TestKey[] keys = Arrays.copyOf(state.keys, SIZE);
             map = TypedMapFactory.byType(type).get();
+            ObjectArrays.shuffle(keys, ThreadLocalRandom.current());
             IntStream.range(0, keys.length).forEach(i -> map.put(state.keys[i], state.values[i]));
-            ObjectArrays.shuffle(keys, state.random);
         }
     }
 }

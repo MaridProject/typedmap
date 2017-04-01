@@ -21,6 +21,8 @@ import org.marid.typedmap.TypedMutableMap;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 /**
@@ -37,6 +39,8 @@ public class TypedLinkedMap<D extends KeyDomain, K extends Key<K, ? super D, ?>,
         for (TypedLinkedMap<D, K, V> m = this; m != null; m = m.next) {
             if (m.key == key) {
                 return true;
+            } else if (m.key.getOrder() > key.getOrder()) {
+                return false;
             }
         }
         return false;
@@ -69,6 +73,8 @@ public class TypedLinkedMap<D extends KeyDomain, K extends Key<K, ? super D, ?>,
         for (TypedLinkedMap<D, K, V> m = this; m != null; m = m.next) {
             if (m.key == key) {
                 return (VAL) m.value;
+            } else if (m.key.getOrder() > key.getOrder()) {
+                return null;
             }
         }
         return null;
@@ -96,6 +102,13 @@ public class TypedLinkedMap<D extends KeyDomain, K extends Key<K, ? super D, ?>,
                 final V old = m.value;
                 m.value = value;
                 return (VAL) old;
+            } else if (m.next != null && m.next.key.getOrder() > key.getOrder()) {
+                final TypedLinkedMap<D, K, V> map = new TypedLinkedMap<>();
+                map.key = (K) key;
+                map.value = value;
+                map.next = m.next;
+                m.next = map;
+                return null;
             } else if (m.next == null) {
                 final TypedLinkedMap<D, K, V> map = new TypedLinkedMap<>();
                 map.key = (K) key;
@@ -104,5 +117,16 @@ public class TypedLinkedMap<D extends KeyDomain, K extends Key<K, ? super D, ?>,
                 return null;
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        final Map<K, V> map = new LinkedHashMap<>();
+        for (TypedLinkedMap<D, K, V> m = this; m != null; m = m.next) {
+            if (m.key != null) {
+                map.put(m.key, m.value);
+            }
+        }
+        return TypedLinkedMap.class.getSimpleName() + map;
     }
 }

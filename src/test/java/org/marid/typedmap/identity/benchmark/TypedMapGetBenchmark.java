@@ -62,7 +62,7 @@ public class TypedMapGetBenchmark {
 
         final TestKey[] keys = new TestKey[SIZE];
 
-        @Param({"linked", "chash", "fus"})
+        @Param({"linked", "i255", "chash", "fus"})
         private String type;
 
         TypedMutableMap<TestKeyDomain, TestKey, Integer> map;

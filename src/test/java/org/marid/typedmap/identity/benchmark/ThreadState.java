@@ -29,7 +29,7 @@ import java.util.Random;
 @State(Scope.Thread)
 public class ThreadState {
 
-    static final int SIZE = 50;
+    static final int SIZE = 48;
 
     final Random random = new Random(0);
     final TestKey[] keys = Arrays.copyOf(TestKeyDomain.TEST_KEYS, SIZE);

@@ -18,12 +18,9 @@ package org.marid.typedmap.indexed;
 import org.marid.typedmap.Key;
 import org.marid.typedmap.KeyDomain;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
+import java.util.*;
 import java.util.function.Supplier;
 
 /**
@@ -32,9 +29,10 @@ import java.util.function.Supplier;
 public class IndexedKey<K extends IndexedKey<K, ?, ?>, D extends KeyDomain, T> implements Key<K, D, T> {
 
     private static final ClassValue<DomainKeyDescriptor> DESCRIPTORS = new ClassValue<DomainKeyDescriptor>() {
+        @SuppressWarnings("unchecked")
         @Override
         protected DomainKeyDescriptor computeValue(Class<?> type) {
-            return new DomainKeyDescriptor();
+            return new DomainKeyDescriptor((Class<? extends KeyDomain>) type);
         }
     };
 
@@ -65,25 +63,34 @@ public class IndexedKey<K extends IndexedKey<K, ?, ?>, D extends KeyDomain, T> i
         return "IndexedKey(" + index + ")";
     }
 
-    static int getKeyCount(Class<? extends KeyDomain> domain) {
-        final AtomicInteger c = new AtomicInteger();
-        walk(domain, d -> c.addAndGet(d.keys.size()));
-        return c.get();
+    @SuppressWarnings("unchecked")
+    public static <D extends KeyDomain, K extends IndexedKey<K, ? super D, ?>> Set<K> getKeys(Class<D> domain) {
+        final LinkedHashSet<K> keys = new LinkedHashSet<>();
+        final DomainKeyDescriptor descriptor = DESCRIPTORS.get(domain);
+        synchronized (descriptor.type) {
+            for (final DomainKeyDescriptor d : descriptor) {
+                synchronized (d.type) {
+                    keys.addAll((Set) d.keys.keySet());
+                }
+            }
+        }
+        return keys;
     }
 
     @SuppressWarnings("unchecked")
     static <K extends IndexedKey<K, ? super D, ?>, D extends KeyDomain> K getKey(Class<D> domain, int index) {
-        try {
-            walk(domain, d -> {
-                final Object o = d.byIndex.get(index);
-                if (o != null) {
-                    throw new Return(o);
+        final DomainKeyDescriptor descriptor = DESCRIPTORS.get(domain);
+        synchronized (descriptor.type) {
+            for (final DomainKeyDescriptor d : descriptor) {
+                synchronized (d.type) {
+                    final Object key = d.byIndex.get(index);
+                    if (key != null) {
+                        return (K) key;
+                    }
                 }
-            });
-        } catch (Return r) {
-            return (K) r.key;
+            }
         }
-        return null;
+        throw new NoSuchElementException("No such key: " + domain.getName() + "(" + index + ")");
     }
 
     @Nullable
@@ -92,37 +99,58 @@ public class IndexedKey<K extends IndexedKey<K, ?, ?>, D extends KeyDomain, T> i
         return defaultValueSupplier.get();
     }
 
-    private static void walk(Class<?> type, Consumer<DomainKeyDescriptor> consumer) {
-        for (Class<?> c = type; c != Object.class && c != null; c = c.getSuperclass()) {
-            consumer.accept(DESCRIPTORS.get(c));
-        }
-        for (final Class<?> c : type.getInterfaces()) {
-            consumer.accept(DESCRIPTORS.get(c));
-        }
-    }
+    private static class DomainKeyDescriptor implements Iterable<DomainKeyDescriptor> {
 
-    private static class DomainKeyDescriptor {
-
-        private final AtomicInteger counter = new AtomicInteger();
+        private final Class<? extends KeyDomain> type;
         private final Map<Object, Class<?>> keys = new IdentityHashMap<>();
         private final Map<Integer, Object> byIndex = new HashMap<>();
 
-        private synchronized int add(IndexedKey key) {
-            final int id = counter.getAndIncrement();
-            final Class<?> oldClass = keys.put(key, key.domain);
-            assert oldClass == null : "Duplicated key for " + oldClass;
-            byIndex.put(id, key);
-            return id;
+        private DomainKeyDescriptor(Class<? extends KeyDomain> type) {
+            this.type = type;
         }
-    }
 
-    private static class Return extends RuntimeException {
+        private int add(IndexedKey key) {
+            synchronized (type) {
+                final int id = getKeys(type).size();
+                final Class<?> oldClass = keys.put(key, key.domain);
+                assert oldClass == null : "Duplicated key for " + oldClass;
+                byIndex.put(id, key);
+                return id;
+            }
+        }
 
-        private final Object key;
+        @Nonnull
+        @Override
+        public Iterator<DomainKeyDescriptor> iterator() {
+            return new Iterator<DomainKeyDescriptor>() {
 
-        private Return(Object key) {
-            super(null, null, false, false);
-            this.key = key;
+                private Class<?> superclass = type;
+                private final Iterator<Class<?>> interfaces = Arrays.asList(type.getInterfaces()).iterator();
+
+                @Override
+                public boolean hasNext() {
+                    if (superclass == type) {
+                        return true;
+                    } else if (superclass != Object.class && superclass != null) {
+                        return superclass.getSuperclass() != Object.class && superclass.getSuperclass() != null;
+                    } else {
+                        return interfaces.hasNext();
+                    }
+                }
+
+                @Override
+                public DomainKeyDescriptor next() {
+                    if (superclass == type) {
+                        superclass = superclass.getSuperclass();
+                        return DomainKeyDescriptor.this;
+                    } else if (superclass != Object.class && superclass != null) {
+                        superclass = superclass.getSuperclass();
+                        return DESCRIPTORS.get(superclass);
+                    } else {
+                        return DESCRIPTORS.get(interfaces.next());
+                    }
+                }
+            };
         }
     }
 }

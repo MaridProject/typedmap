@@ -28,7 +28,7 @@ import java.util.function.BiConsumer;
  */
 public class TypedIndexedKeyMap255<D extends KeyDomain, K extends IndexedKey<K, ? super D, ?>, V> implements TypedMutableMap<D, K, V> {
 
-    private volatile long state;
+    private long state;
 
     private V v0;
     private V v1;
@@ -39,16 +39,14 @@ public class TypedIndexedKeyMap255<D extends KeyDomain, K extends IndexedKey<K, 
     private V v6;
     private V v7;
 
-    private volatile TypedIndexedKeyMap255<D, K, V> next;
+    private TypedIndexedKeyMap255<D, K, V> next;
 
     @Override
     public boolean containsKey(@Nonnull K key) {
         for (TypedIndexedKeyMap255<D, K, V> m = this; m != null; m = m.next) {
-            synchronized (m) {
-                final int index = find(key.getIndex() + 1, m.state, m.size());
-                if (index >= 0) {
-                    return true;
-                }
+            final int index = find(key.getIndex() + 1, m.state, m.size());
+            if (index >= 0) {
+                return true;
             }
         }
         return false;
@@ -57,13 +55,11 @@ public class TypedIndexedKeyMap255<D extends KeyDomain, K extends IndexedKey<K, 
     @Override
     public boolean containsValue(@Nonnull V value) {
         for (TypedIndexedKeyMap255<D, K, V> m = this; m != null; m = m.next) {
-            synchronized (m) {
-                final int n = m.size();
-                for (int i = 0; i < n; i++) {
-                    final V val = getValue(i);
-                    if (val.equals(value)) {
-                        return true;
-                    }
+            final int n = m.size();
+            for (int i = 0; i < n; i++) {
+                final V val = m.getValue(i);
+                if (val.equals(value)) {
+                    return true;
                 }
             }
         }
@@ -80,16 +76,13 @@ public class TypedIndexedKeyMap255<D extends KeyDomain, K extends IndexedKey<K, 
         return state == 0;
     }
 
-    @SuppressWarnings("unchecked")
     @Nullable
     @Override
     public <VAL extends V> VAL get(@Nonnull Key<K, ? super D, VAL> key) {
         for (TypedIndexedKeyMap255<D, K, V> m = this; m != null; m = m.next) {
-            synchronized (m) {
-                final int index = find(key.getKey().getIndex() + 1, m.state, m.size());
-                if (index >= 0) {
-                    return (VAL) getValue(index);
-                }
+            final int index = find(key.getKey().getIndex() + 1, m.state, m.size());
+            if (index >= 0) {
+                return m.getValue(index);
             }
         }
         return null;
@@ -98,72 +91,69 @@ public class TypedIndexedKeyMap255<D extends KeyDomain, K extends IndexedKey<K, 
     @Override
     public void forEach(@Nonnull Class<D> domain, @Nonnull BiConsumer<K, V> consumer) {
         for (TypedIndexedKeyMap255<D, K, V> m = this; m != null; m = m.next) {
-            synchronized (m) {
-                final int n = m.size();
-                final long v = m.state;
-                for (int i = 0; i < n; i++) {
-                    final int keyIndex = key(v, i) - 1;
-                    final K key = IndexedKey.getKey(domain, keyIndex);
-                    if (key != null) {
-                        final V val = getValue(i);
-                        consumer.accept(key, val);
+            final int n = m.size();
+            final long v = m.state;
+            for (int i = 0; i < n; i++) {
+                final int keyIndex = key(v, i) - 1;
+                final K key = IndexedKey.getKey(domain, keyIndex);
+                final V val = m.getValue(i);
+                consumer.accept(key, val);
+            }
+        }
+    }
+
+    @Nullable
+    @Override
+    public <VAL extends V> VAL put(@Nonnull Key<K, ? super D, VAL> key, @Nullable VAL value) {
+        for (TypedIndexedKeyMap255<D, K, V> m = this; ; m = m.next) {
+            final int n = m.size();
+            final long v = m.state;
+            final int index = find(key.getKey().getIndex() + 1, v, m.size());
+            if (index >= 0) {
+                return m.setValue(index, key, value);
+            } else if (m.next == null) {
+                if (n < 8) {
+                    final int pos = -(index + 1);
+                    for (int i = n; i > pos; i--) {
+                        m.setValue(i, key(v, i - 1), m.getValue(i - 1));
                     }
+                    m.setValue(pos, key.getKey().getIndex() + 1, value);
+                    return null;
+                } else {
+                    final TypedIndexedKeyMap255<D, K, V> next = new TypedIndexedKeyMap255<>();
+                    next.setValue(0, key.getKey().getIndex() + 1, value);
+                    m.next = next;
+                    return null;
                 }
             }
         }
     }
 
     @SuppressWarnings("unchecked")
-    @Nullable
-    @Override
-    public <VAL extends V> VAL put(@Nonnull Key<K, ? super D, VAL> key, @Nullable VAL value) {
-        for (TypedIndexedKeyMap255<D, K, V> m = this; m != null; m = m.next) {
-            synchronized (m) {
-                final int n = m.size();
-                final int index = find(key.getKey().getIndex(), m.state, m.size());
-                if (index >= 0) {
-                    return (VAL) setValue(index, key.getKey(), value);
-                } else if (m.next == null) {
-                    if (n < 8) {
-                        return (VAL) setValue(n, key.getKey(), value);
-                    } else {
-                        final TypedIndexedKeyMap255<D, K, V> next = new TypedIndexedKeyMap255<>();
-                        next.v0 = value;
-                        next.state = key.getKey().getIndex() + 1;
-                        m.next = next;
-                        return null;
-                    }
-                }
-            }
-        }
-        return null; // unreachable
-    }
-
-    private V getValue(int index) {
+    private <VAL extends V> VAL getValue(int index) {
         switch (index) {
             case 0:
-                return v0;
+                return (VAL) v0;
             case 1:
-                return v1;
+                return (VAL) v1;
             case 2:
-                return v2;
+                return (VAL) v2;
             case 3:
-                return v3;
+                return (VAL) v3;
             case 4:
-                return v4;
+                return (VAL) v4;
             case 5:
-                return v5;
+                return (VAL) v5;
             case 6:
-                return v6;
+                return (VAL) v6;
             case 7:
-                return v7;
+                return (VAL) v7;
             default:
                 throw new IndexOutOfBoundsException(Integer.toString(index));
         }
     }
 
-    private V setValue(int index, K key, V value) {
-        final V old = getValue(index);
+    private void setValue(int index, int key, V value) {
         switch (index) {
             case 0:
                 v0 = value;
@@ -192,13 +182,30 @@ public class TypedIndexedKeyMap255<D extends KeyDomain, K extends IndexedKey<K, 
             default:
                 throw new IndexOutOfBoundsException(Integer.toString(index));
         }
-        state |= (long) (key.getIndex() + 1) << (index * 8);
+        final long mask;
+        switch (index) {
+            case 0:
+                mask = -1L << 8;
+                break;
+            case 7:
+                mask = -1L >>> 8;
+                break;
+            default:
+                mask = (-1L << (index + 1) * 8) | (-1L >>> (8 - index) * 8);
+                break;
+        }
+        state = (state & mask) | ((long) key << 8 * index);
+    }
+
+    private <VAL extends V> VAL setValue(int index, Key<K, ? super D, VAL> key, VAL value) {
+        final VAL old = getValue(index);
+        setValue(index, key.getKey().getIndex() + 1, value);
         return old;
     }
 
     private static int key(long v, int index) {
         final int offset = 8 * index;
-        return (int) ((v & (0xFF << offset)) >>> offset);
+        return (int) ((v & (0xFFL << offset)) >>> offset);
     }
 
     private static int find(int key, long v, int size) {

@@ -121,16 +121,15 @@ public class TypedIndexedByteKeyMap<D extends KeyDomain, K extends IndexedKey<K,
             final int index = find(key.getOrder() + 1, v, n);
             if (index >= 0) {
                 return m.setValue(index, key, value);
-            } else if (m.next == null) {
-                if (n < 8) {
-                    final int pos = -(index + 1);
-                    for (int i = n; i > pos; i--) {
-                        m.setValue(i, key(v, i - 1), m.getValue(i - 1));
-                    }
-                    m.setValue(pos, key.getOrder() + 1, value);
-                } else {
-                    m.next = new TypedIndexedByteKeyMap<>(key, value);
+            } else if (n < 8) {
+                final int pos = -(index + 1);
+                for (int i = n; i > pos; i--) {
+                    m.setValue(i, key(v, i - 1), m.getValue(i - 1));
                 }
+                m.setValue(pos, key.getOrder() + 1, value);
+                return null;
+            } else if (m.next == null) {
+                m.next = new TypedIndexedByteKeyMap<>(key, value);
                 return null;
             }
         }

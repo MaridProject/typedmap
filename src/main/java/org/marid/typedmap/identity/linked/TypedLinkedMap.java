@@ -21,16 +21,15 @@ import org.marid.typedmap.TypedMutableMap;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.function.BiConsumer;
 
 /**
  * @author Dmitry Ovchinnikov
  */
 public class TypedLinkedMap<D extends KeyDomain, K extends Key, V> implements TypedMutableMap<D, K, V> {
 
-    private TypedLinkedMap<D, K, V> next;
-    private K key;
-    private V value;
+    TypedLinkedMap<D, K, V> next;
+    K key;
+    V value;
 
     @Override
     public boolean containsKey(@Nonnull K key) {
@@ -76,15 +75,6 @@ public class TypedLinkedMap<D extends KeyDomain, K extends Key, V> implements Ty
             }
         }
         return null;
-    }
-
-    @Override
-    public void forEach(@Nonnull Class<D> domain, @Nonnull BiConsumer<K, V> consumer) {
-        for (TypedLinkedMap<D, K, V> m = this; m != null; m = m.next) {
-            if (m.key != null) {
-                consumer.accept(m.key, m.value);
-            }
-        }
     }
 
     @SuppressWarnings("unchecked")

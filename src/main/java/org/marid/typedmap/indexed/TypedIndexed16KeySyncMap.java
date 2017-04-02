@@ -20,7 +20,6 @@ import org.marid.typedmap.KeyDomain;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.function.BiConsumer;
 
 /**
  * @author Dmitry Ovchinnikov
@@ -35,11 +34,6 @@ public class TypedIndexed16KeySyncMap<D extends KeyDomain, K extends IndexedKey,
     @Override
     public synchronized int size() {
         return super.size();
-    }
-
-    @Override
-    public synchronized void forEach(@Nonnull Class<D> domain, @Nonnull BiConsumer<K, V> consumer) {
-        super.forEach(domain, consumer);
     }
 
     @Nullable

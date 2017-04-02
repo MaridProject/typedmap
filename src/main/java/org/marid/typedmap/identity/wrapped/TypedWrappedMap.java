@@ -23,7 +23,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
 /**
  * @author Dmitry Ovchinnikov
@@ -65,11 +64,6 @@ public class TypedWrappedMap<D extends KeyDomain, K extends Key, V> implements T
     @Override
     public <VAL extends V> VAL get(@Nonnull Key<? super D, VAL> key) {
         return (VAL) delegate.getOrDefault(key, key.getDefault());
-    }
-
-    @Override
-    public void forEach(@Nonnull Class<D> domain, @Nonnull BiConsumer<K, V> consumer) {
-        delegate.forEach(consumer);
     }
 
     @SuppressWarnings("unchecked")

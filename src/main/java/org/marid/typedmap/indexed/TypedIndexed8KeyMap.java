@@ -21,7 +21,6 @@ import org.marid.typedmap.TypedMutableMap;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.function.BiConsumer;
 
 /**
  * @author Dmitry Ovchinnikov
@@ -97,20 +96,6 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, K extends IndexedKey, V> i
             }
         }
         return null;
-    }
-
-    @Override
-    public void forEach(@Nonnull Class<D> domain, @Nonnull BiConsumer<K, V> consumer) {
-        for (TypedIndexed8KeyMap<D, K, V> m = this; m != null; m = m.next) {
-            final int n = m.size();
-            final long v = m.state;
-            for (int i = 0; i < n; i++) {
-                final int keyIndex = key(v, i);
-                final K key = IndexedKey.getKey(domain, keyIndex);
-                final V val = m.getValue(i);
-                consumer.accept(key, val);
-            }
-        }
     }
 
     @Nullable

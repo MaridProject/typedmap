@@ -73,7 +73,14 @@ public class TypedMapTest {
         pairs.forEach(p -> map.put(p.getKey(), p.getValue()));
 
         final Map<TestKey, Integer> actualMap = new HashMap<>();
-        map.forEach(TestKeyDomain.class, actualMap::put);
+        for (final TestKey testKey : TestKeyDomain.TEST_KEYS) {
+            if (map.containsKey(testKey)) {
+                final Integer value = map.get(testKey);
+                if (value != null) {
+                    actualMap.put(testKey, value);
+                }
+            }
+        }
 
         assertEquals(actualMap, expectedMap);
     }

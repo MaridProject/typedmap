@@ -13,12 +13,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap.identity;
+package org.marid.typedmap.identity.linked;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrays;
 import org.marid.typedmap.TestKey;
 import org.marid.typedmap.TestKeyDomain;
-import org.marid.typedmap.identity.linked.TypedLinkedMap;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -57,7 +56,11 @@ public class TypedLinkedMapTest {
         }
 
         final List<TestKey> keys = new ArrayList<>();
-        map.forEach(TestKeyDomain.class, (k, v) -> keys.add(k));
+        for (TypedLinkedMap<TestKeyDomain, TestKey, Integer> m = map; m != null; m = m.next) {
+            if (m.value != null) {
+                keys.add(m.key);
+            }
+        }
 
         final TestKey[] actual = keys.toArray(new TestKey[keys.size()]);
         final TestKey[] expected = Stream.of(testKeys).sorted(comparingInt(TestKey::getOrder)).toArray(TestKey[]::new);

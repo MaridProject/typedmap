@@ -20,7 +20,6 @@ import org.marid.typedmap.KeyDomain;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.function.BiConsumer;
 
 /**
  * @author Dmitry Ovchinnikov
@@ -57,10 +56,5 @@ public class TypedLinkedSyncMap<D extends KeyDomain, K extends Key, V> extends T
     @Override
     public synchronized <VAL extends V> VAL put(@Nonnull Key<? super D, VAL> key, @Nullable VAL value) {
         return super.put(key, value);
-    }
-
-    @Override
-    public synchronized void forEach(@Nonnull Class<D> domain, @Nonnull BiConsumer<K, V> consumer) {
-        super.forEach(domain, consumer);
     }
 }

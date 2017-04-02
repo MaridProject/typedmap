@@ -17,7 +17,6 @@ package org.marid.typedmap;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.function.BiConsumer;
 
 /**
  * @author Dmitry Ovchinnikov
@@ -34,6 +33,4 @@ public interface TypedMap<D extends KeyDomain, K extends Key, V> {
 
     @Nullable
     <VAL extends V> VAL get(@Nonnull Key<? super D, VAL> key);
-
-    void forEach(@Nonnull Class<D> domain, @Nonnull BiConsumer<K, V> consumer);
 }

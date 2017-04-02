@@ -22,7 +22,7 @@ import org.marid.typedmap.indexed.TypedIndexed8KeyMap;
  */
 public class SampleKeyMapTest {
 
-    private final TypedIndexed8KeyMap<AggregatedDomain, SampleKey<AggregatedDomain, Number>, Number> map = new TypedIndexed8KeyMap<>();
+    private final TypedIndexed8KeyMap<AggregatedDomain, Number> map = new TypedIndexed8KeyMap<>();
 
     public void test1() {
         map.put(Domain1.KEY1, 1);

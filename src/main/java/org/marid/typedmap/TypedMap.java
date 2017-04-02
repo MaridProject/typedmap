@@ -21,11 +21,9 @@ import javax.annotation.Nullable;
 /**
  * @author Dmitry Ovchinnikov
  */
-public interface TypedMap<D extends KeyDomain, K extends Key, V> {
+public interface TypedMap<D extends KeyDomain, V> {
 
-    boolean containsKey(@Nonnull K key);
-
-    boolean containsValue(@Nonnull V value);
+    boolean containsKey(@Nonnull Key<? super D, V> key);
 
     int size();
 

@@ -15,7 +15,6 @@
 
 package org.marid.typedmap.indexed;
 
-import org.marid.typedmap.TestKey;
 import org.marid.typedmap.TestKeyDomain;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -45,12 +44,12 @@ public class TypedIndexedKeyMapTest {
 
     @Test(dataProvider = "indexed8Data")
     public void testBatch8Size(int entries, int expectedSize) {
-        final TypedIndexed8KeyMap<TestKeyDomain, TestKey, Integer> map = new TypedIndexed8KeyMap<>();
+        final TypedIndexed8KeyMap<TestKeyDomain, Integer> map = new TypedIndexed8KeyMap<>();
 
         IntStream.range(0, entries).forEach(i -> map.put(TestKeyDomain.TEST_KEYS[i], i));
 
         int actualSize = 0;
-        for (TypedIndexed8KeyMap<TestKeyDomain, TestKey, Integer> m = map; m != null; m = m.next) {
+        for (TypedIndexed8KeyMap<TestKeyDomain, Integer> m = map; m != null; m = m.next) {
             actualSize++;
         }
 
@@ -72,12 +71,12 @@ public class TypedIndexedKeyMapTest {
 
     @Test(dataProvider = "indexed16Data")
     public void testBatch16Size(int entries, int expectedSize) {
-        final TypedIndexed16KeyMap<TestKeyDomain, TestKey, Integer> map = new TypedIndexed16KeyMap<>();
+        final TypedIndexed16KeyMap<TestKeyDomain, Integer> map = new TypedIndexed16KeyMap<>();
 
         IntStream.range(0, entries).forEach(i -> map.put(TestKeyDomain.TEST_KEYS[i], i));
 
         int actualSize = 0;
-        for (TypedIndexed16KeyMap<TestKeyDomain, TestKey, Integer> m = map; m != null; m = m.next) {
+        for (TypedIndexed16KeyMap<TestKeyDomain, Integer> m = map; m != null; m = m.next) {
             actualSize++;
         }
 

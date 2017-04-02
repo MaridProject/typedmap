@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedIndexed16KeyMap<D extends KeyDomain, K extends IndexedKey, V> implements TypedMutableMap<D, K, V> {
+public class TypedIndexed16KeyMap<D extends KeyDomain, V> implements TypedMutableMap<D, V> {
 
     private long s1;
     private long s2;
@@ -48,7 +48,7 @@ public class TypedIndexed16KeyMap<D extends KeyDomain, K extends IndexedKey, V> 
     private V v14;
     private V v15;
 
-    TypedIndexed16KeyMap<D, K, V> next;
+    TypedIndexed16KeyMap<D, V> next;
 
     public TypedIndexed16KeyMap() {
     }
@@ -59,26 +59,12 @@ public class TypedIndexed16KeyMap<D extends KeyDomain, K extends IndexedKey, V> 
     }
 
     @Override
-    public boolean containsKey(@Nonnull K key) {
+    public boolean containsKey(@Nonnull Key<? super D, V> key) {
         final int order = key.getOrder();
-        for (TypedIndexed16KeyMap<D, K, V> m = this; m != null; m = m.next) {
+        for (TypedIndexed16KeyMap<D, V> m = this; m != null; m = m.next) {
             final int index = find(order, m.s1, m.s2, m.size());
             if (index >= 0) {
                 return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean containsValue(@Nonnull V value) {
-        for (TypedIndexed16KeyMap<D, K, V> m = this; m != null; m = m.next) {
-            final int n = m.size();
-            for (int i = 0; i < n; i++) {
-                final V val = m.getValue(i);
-                if (val.equals(value)) {
-                    return true;
-                }
             }
         }
         return false;
@@ -99,7 +85,7 @@ public class TypedIndexed16KeyMap<D extends KeyDomain, K extends IndexedKey, V> 
     @Override
     public <VAL extends V> VAL get(@Nonnull Key<? super D, VAL> key) {
         final int order = key.getOrder();
-        for (TypedIndexed16KeyMap<D, K, V> m = this; m != null; m = m.next) {
+        for (TypedIndexed16KeyMap<D, V> m = this; m != null; m = m.next) {
             final int index = find(order, m.s1, m.s2, m.size());
             if (index >= 0) {
                 return (VAL) m.getValue(index);
@@ -112,7 +98,7 @@ public class TypedIndexed16KeyMap<D extends KeyDomain, K extends IndexedKey, V> 
     @Override
     public <VAL extends V> VAL put(@Nonnull Key<? super D, VAL> key, @Nullable VAL value) {
         final int order = key.getOrder();
-        for (TypedIndexed16KeyMap<D, K, V> m = this; ; m = m.next) {
+        for (TypedIndexed16KeyMap<D, V> m = this; ; m = m.next) {
             final int n = m.size();
             final long v1 = m.s1, v2 = m.s2;
             final int index = find(order, v1, v2, n);

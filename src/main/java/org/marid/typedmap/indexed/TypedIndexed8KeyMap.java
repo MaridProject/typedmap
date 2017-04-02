@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedIndexed8KeyMap<D extends KeyDomain, K extends IndexedKey, V> implements TypedMutableMap<D, K, V> {
+public class TypedIndexed8KeyMap<D extends KeyDomain, V> implements TypedMutableMap<D, V> {
 
     private long state;
 
@@ -38,7 +38,7 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, K extends IndexedKey, V> i
     private V v6;
     private V v7;
 
-    TypedIndexed8KeyMap<D, K, V> next;
+    TypedIndexed8KeyMap<D, V> next;
 
     public TypedIndexed8KeyMap() {
     }
@@ -49,26 +49,12 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, K extends IndexedKey, V> i
     }
 
     @Override
-    public boolean containsKey(@Nonnull K key) {
+    public boolean containsKey(@Nonnull Key<? super D, V> key) {
         final int order = key.getOrder();
-        for (TypedIndexed8KeyMap<D, K, V> m = this; m != null; m = m.next) {
+        for (TypedIndexed8KeyMap<D, V> m = this; m != null; m = m.next) {
             final int index = find(order, m.state, m.size());
             if (index >= 0) {
                 return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean containsValue(@Nonnull V value) {
-        for (TypedIndexed8KeyMap<D, K, V> m = this; m != null; m = m.next) {
-            final int n = m.size();
-            for (int i = 0; i < n; i++) {
-                final V val = m.getValue(i);
-                if (val.equals(value)) {
-                    return true;
-                }
             }
         }
         return false;
@@ -89,7 +75,7 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, K extends IndexedKey, V> i
     @Override
     public <VAL extends V> VAL get(@Nonnull Key<? super D, VAL> key) {
         final int order = key.getOrder();
-        for (TypedIndexed8KeyMap<D, K, V> m = this; m != null; m = m.next) {
+        for (TypedIndexed8KeyMap<D, V> m = this; m != null; m = m.next) {
             final int index = find(order, m.state, m.size());
             if (index >= 0) {
                 return (VAL) m.getValue(index);
@@ -102,7 +88,7 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, K extends IndexedKey, V> i
     @Override
     public <VAL extends V> VAL put(@Nonnull Key<? super D, VAL> key, @Nullable VAL value) {
         final int order = key.getOrder();
-        for (TypedIndexed8KeyMap<D, K, V> m = this; ; m = m.next) {
+        for (TypedIndexed8KeyMap<D, V> m = this; ; m = m.next) {
             final int n = m.size();
             final long v = m.state;
             final int index = find(order, v, n);

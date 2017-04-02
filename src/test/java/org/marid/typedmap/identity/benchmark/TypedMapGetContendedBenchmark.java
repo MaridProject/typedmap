@@ -49,7 +49,7 @@ public class TypedMapGetContendedBenchmark {
     @Benchmark
     public int get(GetState getState, CommonState state) {
         int s = 0;
-        final TypedMutableMap<TestKeyDomain, TestKey, Integer> map = state.map;
+        final TypedMutableMap<TestKeyDomain, Integer> map = state.map;
         for (final TestKey[] testKeys : getState.keys) {
             for (final TestKey testKey : testKeys) {
                 s ^= Objects.hashCode(map.get(testKey));
@@ -71,12 +71,12 @@ public class TypedMapGetContendedBenchmark {
         @Param({"linked", "i255", "chash", "fus"})
         private String type;
 
-        volatile TypedMutableMap<TestKeyDomain, TestKey, Integer> map;
+        volatile TypedMutableMap<TestKeyDomain, Integer> map;
 
         @Setup(Level.Iteration)
         public void initMap(ThreadState state) {
             final TestKey[] keys = Arrays.copyOf(state.keys, SIZE);
-            final TypedMutableMap<TestKeyDomain, TestKey, Integer> map = TypedMapFactory.byType(type).get();
+            final TypedMutableMap<TestKeyDomain, Integer> map = TypedMapFactory.byType(type).get();
             ObjectArrays.shuffle(keys, ThreadLocalRandom.current());
             IntStream.range(0, keys.length).forEach(i -> map.put(state.keys[i], state.values[i]));
             this.map = map;

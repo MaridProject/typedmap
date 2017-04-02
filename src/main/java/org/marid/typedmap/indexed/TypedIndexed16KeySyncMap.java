@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedIndexed16KeySyncMap<D extends KeyDomain, K extends IndexedKey, V> extends TypedIndexed16KeyMap<D, K, V> {
+public class TypedIndexed16KeySyncMap<D extends KeyDomain, V> extends TypedIndexed16KeyMap<D, V> {
 
     @Override
     public synchronized boolean isEmpty() {
@@ -38,23 +38,12 @@ public class TypedIndexed16KeySyncMap<D extends KeyDomain, K extends IndexedKey,
 
     @Nullable
     @Override
-    public synchronized <VAL extends V> VAL get(@Nonnull Key<? super D, VAL> key) {
-        return super.get(key);
-    }
-
-    @Nullable
-    @Override
     public synchronized <VAL extends V> VAL put(@Nonnull Key<? super D, VAL> key, @Nullable VAL value) {
         return super.put(key, value);
     }
 
     @Override
-    public synchronized boolean containsValue(@Nonnull V value) {
-        return super.containsValue(value);
-    }
-
-    @Override
-    public synchronized boolean containsKey(@Nonnull K key) {
+    public synchronized boolean containsKey(@Nonnull Key<? super D, V> key) {
         return super.containsKey(key);
     }
 }

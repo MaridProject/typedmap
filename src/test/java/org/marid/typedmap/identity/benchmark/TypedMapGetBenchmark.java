@@ -49,7 +49,7 @@ public class TypedMapGetBenchmark {
     @Benchmark
     public int get(GetState getState) {
         int s = 0;
-        final TypedMutableMap<TestKeyDomain, TestKey, Integer> map = getState.map;
+        final TypedMutableMap<TestKeyDomain, Integer> map = getState.map;
         for (final TestKey[] testKeys : getState.keys) {
             for (final TestKey testKey : testKeys) {
                 s ^= Objects.hashCode(map.get(testKey));
@@ -73,7 +73,7 @@ public class TypedMapGetBenchmark {
         @Param({"linked", "i255", "chash", "fus"})
         private String type;
 
-        TypedMutableMap<TestKeyDomain, TestKey, Integer> map;
+        TypedMutableMap<TestKeyDomain, Integer> map;
 
         @Setup(Level.Trial)
         public void init(ThreadState state) {

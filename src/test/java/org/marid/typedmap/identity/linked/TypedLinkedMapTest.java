@@ -50,15 +50,15 @@ public class TypedLinkedMapTest {
 
     @Test(dataProvider = "orderData")
     public void testOrder(Random random, TestKey[] testKeys) {
-        final TypedLinkedMap<TestKeyDomain, TestKey, Integer> map = new TypedLinkedMap<>();
+        final TypedLinkedMap<TestKeyDomain, Integer> map = new TypedLinkedMap<>();
         for (final TestKey testKey : testKeys) {
             assertNull(map.put(testKey, random.nextInt()));
         }
 
         final List<TestKey> keys = new ArrayList<>();
-        for (TypedLinkedMap<TestKeyDomain, TestKey, Integer> m = map; m != null; m = m.next) {
+        for (TypedLinkedMap<TestKeyDomain, Integer> m = map; m != null; m = m.next) {
             if (m.value != null) {
-                keys.add(m.key);
+                keys.add((TestKey) m.key);
             }
         }
 

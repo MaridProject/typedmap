@@ -24,15 +24,10 @@ import javax.annotation.Nullable;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedLinkedSyncMap<D extends KeyDomain, K extends Key, V> extends TypedLinkedMap<D, K, V> {
+public class TypedLinkedSyncMap<D extends KeyDomain, V> extends TypedLinkedMap<D, V> {
 
     @Override
-    public synchronized boolean containsValue(@Nonnull V value) {
-        return super.containsValue(value);
-    }
-
-    @Override
-    public synchronized boolean containsKey(@Nonnull K key) {
+    public synchronized boolean containsKey(@Nonnull Key<? super D, V> key) {
         return super.containsKey(key);
     }
 

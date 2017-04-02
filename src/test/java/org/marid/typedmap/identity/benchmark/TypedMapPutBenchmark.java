@@ -15,7 +15,6 @@
 
 package org.marid.typedmap.identity.benchmark;
 
-import org.marid.typedmap.TestKey;
 import org.marid.typedmap.TestKeyDomain;
 import org.marid.typedmap.TypedMutableMap;
 import org.openjdk.jmh.annotations.*;
@@ -41,8 +40,8 @@ import static org.marid.typedmap.identity.benchmark.ThreadState.SIZE;
 public class TypedMapPutBenchmark {
 
     @Benchmark
-    public TypedMutableMap<TestKeyDomain, TestKey, Integer> put(ThreadState state, PutState putState) {
-        final TypedMutableMap<TestKeyDomain, TestKey, Integer> map = putState.supplier.get();
+    public TypedMutableMap<TestKeyDomain, Integer> put(ThreadState state, PutState putState) {
+        final TypedMutableMap<TestKeyDomain, Integer> map = putState.supplier.get();
         for (int i = 0; i < SIZE; i++) {
             map.put(state.keys[i], state.values[i]);
         }
@@ -64,7 +63,7 @@ public class TypedMapPutBenchmark {
         @Param({"linked", "i255", "chash", "fus"})
         private String type;
 
-        Supplier<TypedMutableMap<TestKeyDomain, TestKey, Integer>> supplier;
+        Supplier<TypedMutableMap<TestKeyDomain, Integer>> supplier;
 
         @Setup
         public void init() {

@@ -24,15 +24,10 @@ import javax.annotation.Nullable;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedIndexed8KeySyncMap<D extends KeyDomain, K extends IndexedKey, V> extends TypedIndexed8KeyMap<D, K, V> {
+public class TypedIndexed8KeySyncMap<D extends KeyDomain, V> extends TypedIndexed8KeyMap<D, V> {
 
     @Override
-    public synchronized boolean containsValue(@Nonnull V value) {
-        return super.containsValue(value);
-    }
-
-    @Override
-    public synchronized boolean containsKey(@Nonnull K key) {
+    public synchronized boolean containsKey(@Nonnull Key<? super D, V> key) {
         return super.containsKey(key);
     }
 

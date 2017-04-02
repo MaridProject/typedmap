@@ -38,7 +38,7 @@ public class TypedMapTest {
 
     private static final int ENTRY_COUNT = 20;
     private static final int ENTRY_SET_COUNT = 10;
-    private static final List<Supplier<TypedMutableMap<TestKeyDomain, TestKey, Integer>>> MAP_SUPPLIERS = Arrays.asList(
+    private static final List<Supplier<TypedMutableMap<TestKeyDomain, Integer>>> MAP_SUPPLIERS = Arrays.asList(
             TypedWrappedMap::new,
             TypedLinkedMap::new,
             TypedIndexed8KeyMap::new,
@@ -66,7 +66,7 @@ public class TypedMapTest {
     }
 
     @Test(dataProvider = "setsOfEntries")
-    public void test(TypedMutableMap<TestKeyDomain, TestKey, Integer> map, List<Pair<TestKey, Integer>> pairs) {
+    public void test(TypedMutableMap<TestKeyDomain, Integer> map, List<Pair<TestKey, Integer>> pairs) {
         final Map<TestKey, Integer> expectedMap = pairs.stream()
                 .collect(toMap(Pair::getKey, Pair::getValue, (v1, v2) -> v2));
 

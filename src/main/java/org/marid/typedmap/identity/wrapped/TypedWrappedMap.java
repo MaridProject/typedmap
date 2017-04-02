@@ -27,11 +27,11 @@ import java.util.Map;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedWrappedMap<D extends KeyDomain, K extends Key, V> implements TypedMutableMap<D, K, V> {
+public class TypedWrappedMap<D extends KeyDomain, V> implements TypedMutableMap<D, V> {
 
-    private final Map<K, V> delegate;
+    private final Map<Key<? super D, ? extends V>, V> delegate;
 
-    public TypedWrappedMap(Map<K, V> delegate) {
+    public TypedWrappedMap(Map<Key<? super D, ? extends V>, V> delegate) {
         this.delegate = delegate;
     }
 
@@ -40,13 +40,8 @@ public class TypedWrappedMap<D extends KeyDomain, K extends Key, V> implements T
     }
 
     @Override
-    public boolean containsKey(@Nonnull K key) {
+    public boolean containsKey(@Nonnull Key<? super D, V> key) {
         return delegate.containsKey(key);
-    }
-
-    @Override
-    public boolean containsValue(@Nonnull V value) {
-        return delegate.containsValue(value);
     }
 
     @Override
@@ -71,7 +66,7 @@ public class TypedWrappedMap<D extends KeyDomain, K extends Key, V> implements T
     @Override
     public <VAL extends V> VAL put(@Nonnull Key<? super D, VAL> key, @Nullable VAL value) {
         return value == null
-                ? (VAL) delegate.remove((K) key)
-                : (VAL) delegate.put((K) key, value);
+                ? (VAL) delegate.remove(key)
+                : (VAL) delegate.put(key, value);
     }
 }

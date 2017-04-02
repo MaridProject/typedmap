@@ -16,7 +16,6 @@
 package org.marid.typedmap.identity.benchmark;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import org.marid.typedmap.TestKey;
 import org.marid.typedmap.TestKeyDomain;
 import org.marid.typedmap.TypedMutableMap;
 import org.marid.typedmap.identity.linked.TypedLinkedSyncMap;
@@ -24,7 +23,6 @@ import org.marid.typedmap.identity.wrapped.TypedWrappedMap;
 import org.marid.typedmap.indexed.TypedIndexed16KeySyncMap;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
@@ -33,18 +31,14 @@ import java.util.function.Supplier;
  */
 interface TypedMapFactory {
 
-    static Supplier<TypedMutableMap<TestKeyDomain, TestKey, Integer>> wrap(Supplier<Map<TestKey, Integer>> s) {
-        return () -> new TypedWrappedMap<>(s.get());
-    }
-
-    static Supplier<TypedMutableMap<TestKeyDomain, TestKey, Integer>> byType(String type) {
+    static Supplier<TypedMutableMap<TestKeyDomain, Integer>> byType(String type) {
         switch (type) {
             case "linked":
                 return TypedLinkedSyncMap::new;
             case "chash":
-                return wrap(ConcurrentHashMap::new);
+                return () -> new TypedWrappedMap<>(new ConcurrentHashMap<>());
             case "fus":
-                return wrap(() -> Collections.synchronizedMap(new Object2ObjectOpenHashMap<>()));
+                return (() -> new TypedWrappedMap<>(Collections.synchronizedMap(new Object2ObjectOpenHashMap<>())));
             case "i255":
                 return TypedIndexed16KeySyncMap::new;
             default:

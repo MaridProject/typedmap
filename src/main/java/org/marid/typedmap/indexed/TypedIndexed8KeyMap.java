@@ -46,14 +46,15 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, K extends IndexedKey<K, ? 
     }
 
     private TypedIndexed8KeyMap(Key<K, ?, ?> key, V val) {
-        state = key.getOrder() + 1;
+        state = key.getOrder();
         v0 = val;
     }
 
     @Override
     public boolean containsKey(@Nonnull K key) {
+        final int order = key.getOrder();
         for (TypedIndexed8KeyMap<D, K, V> m = this; m != null; m = m.next) {
-            final int index = find(key.getOrder() + 1, m.state, m.size());
+            final int index = find(order, m.state, m.size());
             if (index >= 0) {
                 return true;
             }
@@ -89,8 +90,9 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, K extends IndexedKey<K, ? 
     @Nullable
     @Override
     public <VAL extends V> VAL get(@Nonnull Key<K, ? super D, VAL> key) {
+        final int order = key.getOrder();
         for (TypedIndexed8KeyMap<D, K, V> m = this; m != null; m = m.next) {
-            final int index = find(key.getOrder() + 1, m.state, m.size());
+            final int index = find(order, m.state, m.size());
             if (index >= 0) {
                 return (VAL) m.getValue(index);
             }
@@ -104,7 +106,7 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, K extends IndexedKey<K, ? 
             final int n = m.size();
             final long v = m.state;
             for (int i = 0; i < n; i++) {
-                final int keyIndex = key(v, i) - 1;
+                final int keyIndex = key(v, i);
                 final K key = IndexedKey.getKey(domain, keyIndex);
                 final V val = m.getValue(i);
                 consumer.accept(key, val);
@@ -115,10 +117,11 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, K extends IndexedKey<K, ? 
     @Nullable
     @Override
     public <VAL extends V> VAL put(@Nonnull Key<K, ? super D, VAL> key, @Nullable VAL value) {
+        final int order = key.getOrder();
         for (TypedIndexed8KeyMap<D, K, V> m = this; ; m = m.next) {
             final int n = m.size();
             final long v = m.state;
-            final int index = find(key.getOrder() + 1, v, n);
+            final int index = find(order, v, n);
             if (index >= 0) {
                 return m.setValue(index, key, value);
             } else if (n < 8) {
@@ -126,7 +129,7 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, K extends IndexedKey<K, ? 
                 for (int i = n; i > pos; i--) {
                     m.setValue(i, key(v, i - 1), m.getValue(i - 1));
                 }
-                m.setValue(pos, key.getOrder() + 1, value);
+                m.setValue(pos, order, value);
                 return null;
             } else if (m.next == null) {
                 m.next = new TypedIndexed8KeyMap<>(key, value);
@@ -184,7 +187,7 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, K extends IndexedKey<K, ? 
             case 7: old = v7; v7 = value; break;
             default: throw new IndexOutOfBoundsException(Integer.toString(index));
         }
-        updateState(index, key.getOrder() + 1);
+        updateState(index, key.getOrder());
         return (VAL) old;
     }
 

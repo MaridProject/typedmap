@@ -36,8 +36,8 @@ public class IndexedKey<K extends IndexedKey<K, ? super D, ? extends T>, D exten
         }
     };
 
-    private final Class<D> domain;
     private final int index;
+    private final Class<D> domain;
     private final Supplier<? extends T> defaultValueSupplier;
 
     public IndexedKey(Class<D> domain, Supplier<? extends T> defaultValueSupplier) {
@@ -116,9 +116,9 @@ public class IndexedKey<K extends IndexedKey<K, ? super D, ? extends T>, D exten
 
         private int add(IndexedKey key) {
             synchronized (type) {
-                final int id = getKeys(type).size();
                 final Class<?> oldClass = keys.put(key, key.domain);
                 assert oldClass == null : "Duplicated key for " + oldClass;
+                final int id = getKeys(type).size();
                 byIndex.put(id, key);
                 return id;
             }

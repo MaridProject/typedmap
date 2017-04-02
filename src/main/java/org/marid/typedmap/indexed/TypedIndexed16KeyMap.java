@@ -56,15 +56,15 @@ public class TypedIndexed16KeyMap<D extends KeyDomain, K extends IndexedKey<K, ?
     }
 
     private TypedIndexed16KeyMap(Key<K, ?, ?> key, V val) {
-        s1 = key.getOrder() + 1;
+        s1 = key.getOrder();
         v0 = val;
     }
 
     @Override
     public boolean containsKey(@Nonnull K key) {
-        final int keyIndex = key.getOrder() + 1;
+        final int order = key.getOrder();
         for (TypedIndexed16KeyMap<D, K, V> m = this; m != null; m = m.next) {
-            final int index = find(keyIndex, m.s1, m.s2, m.size());
+            final int index = find(order, m.s1, m.s2, m.size());
             if (index >= 0) {
                 return true;
             }
@@ -100,9 +100,9 @@ public class TypedIndexed16KeyMap<D extends KeyDomain, K extends IndexedKey<K, ?
     @Nullable
     @Override
     public <VAL extends V> VAL get(@Nonnull Key<K, ? super D, VAL> key) {
-        final int keyIndex = key.getOrder() + 1;
+        final int order = key.getOrder();
         for (TypedIndexed16KeyMap<D, K, V> m = this; m != null; m = m.next) {
-            final int index = find(keyIndex, m.s1, m.s2, m.size());
+            final int index = find(order, m.s1, m.s2, m.size());
             if (index >= 0) {
                 return (VAL) m.getValue(index);
             }
@@ -116,7 +116,7 @@ public class TypedIndexed16KeyMap<D extends KeyDomain, K extends IndexedKey<K, ?
             final int n = m.size();
             final long v1 = m.s1, v2 = m.s2;
             for (int i = 0; i < n; i++) {
-                final int keyIndex = key(v1, v2, i) - 1;
+                final int keyIndex = key(v1, v2, i);
                 final K key = IndexedKey.getKey(domain, keyIndex);
                 final V val = m.getValue(i);
                 consumer.accept(key, val);
@@ -127,11 +127,11 @@ public class TypedIndexed16KeyMap<D extends KeyDomain, K extends IndexedKey<K, ?
     @Nullable
     @Override
     public <VAL extends V> VAL put(@Nonnull Key<K, ? super D, VAL> key, @Nullable VAL value) {
-        final int keyIndex = key.getOrder() + 1;
+        final int order = key.getOrder();
         for (TypedIndexed16KeyMap<D, K, V> m = this; ; m = m.next) {
             final int n = m.size();
             final long v1 = m.s1, v2 = m.s2;
-            final int index = find(keyIndex, v1, v2, n);
+            final int index = find(order, v1, v2, n);
             if (index >= 0) {
                 return m.setValue(index, key, value);
             } else if (n < 16) {
@@ -139,7 +139,7 @@ public class TypedIndexed16KeyMap<D extends KeyDomain, K extends IndexedKey<K, ?
                 for (int i = n; i > pos; i--) {
                     m.setValue(i, key(v1, v2, i - 1), m.getValue(i - 1));
                 }
-                m.setValue(pos, keyIndex, value);
+                m.setValue(pos, order, value);
                 return null;
             } else if (m.next == null) {
                 m.next = new TypedIndexed16KeyMap<>(key, value);
@@ -226,7 +226,7 @@ public class TypedIndexed16KeyMap<D extends KeyDomain, K extends IndexedKey<K, ?
             case 15: old = v15; v15 = value; break;
             default: throw new IndexOutOfBoundsException(Integer.toString(index));
         }
-        updateState(index, key.getOrder() + 1);
+        updateState(index, key.getOrder());
         return (VAL) old;
     }
 

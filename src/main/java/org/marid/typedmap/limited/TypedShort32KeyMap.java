@@ -101,7 +101,7 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
     public boolean containsKey(@Nonnull Key<? extends D, V> key) {
         final int order = key.getOrder();
         for (TypedShort32KeyMap<D, V> m = this; m != null; m = m.next) {
-            final int index = find(order, m.s1, m.s2, m.s3, m.s4, m.s5, m.s6, m.s7, m.s8, m.size());
+            final int index = find(order, m.size(), m.s1, m.s2, m.s3, m.s4, m.s5, m.s6, m.s7, m.s8);
             if (index >= 0) {
                 return true;
             }
@@ -133,7 +133,7 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
     public <VAL extends V> VAL get(@Nonnull Key<? extends D, VAL> key) {
         final int order = key.getOrder();
         for (TypedShort32KeyMap<D, V> m = this; m != null; m = m.next) {
-            final int index = find(order, m.s1, m.s2, m.s3, m.s4, m.s5, m.s6, m.s7, m.s8, m.size());
+            final int index = find(order, m.size(), m.s1, m.s2, m.s3, m.s4, m.s5, m.s6, m.s7, m.s8);
             if (index >= 0) {
                 return (VAL) m.getValue(index);
             }
@@ -148,13 +148,13 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
         for (TypedShort32KeyMap<D, V> m = this; ; m = m.next) {
             final int n = m.size();
             final long v1 = m.s1, v2 = m.s2, v3 = m.s3, v4 = m.s4, v5 = m.s5, v6 = m.s6, v7 = m.s7, v8 = m.s8;
-            final int index = find(order, v1, v2, v3, v4, v5, v6, v7, v8, n);
+            final int index = find(order, n, v1, v2, v3, v4, v5, v6, v7, v8);
             if (index >= 0) {
                 return m.setValue(index, key, value);
             } else if (n < 32) {
                 final int pos = -(index + 1);
                 for (int i = n; i > pos; i--) {
-                    m.setValue(i, key(v1, v2, v3, v4, v5, v6, v7, v8, i - 1), m.getValue(i - 1));
+                    m.setValue(i, key(i - 1, v1, v2, v3, v4, v5, v6, v7, v8), m.getValue(i - 1));
                 }
                 m.setValue(pos, order, value);
                 return null;
@@ -327,7 +327,7 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
         return (VAL) old;
     }
 
-    private static int key(long v1, long v2, long v3, long v4, long v5, long v6, long v7, long v8, int index) {
+    private static int key(int index, long v1, long v2, long v3, long v4, long v5, long v6, long v7, long v8) {
         final int offset = (index % 4) * 16;
         switch (index / 4) {
             case 0:
@@ -351,13 +351,13 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
         }
     }
 
-    private static int find(int key, long v1, long v2, long v3, long v4, long v5, long v6, long v7, long v8, int size) {
+    private static int find(int key, int size, long v1, long v2, long v3, long v4, long v5, long v6, long v7, long v8) {
         int low = 0;
         int high = size - 1;
 
         while (low <= high) {
             final int mid = (low + high) >>> 1;
-            final int midVal = key(v1, v2, v3, v4, v5, v6, v7, v8, mid);
+            final int midVal = key(mid, v1, v2, v3, v4, v5, v6, v7, v8);
 
             if (midVal < key) low = mid + 1;
             else if (midVal > key) high = mid - 1;

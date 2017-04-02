@@ -26,7 +26,7 @@ import java.util.function.Supplier;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class IndexedKey<K extends IndexedKey<K, ? super D, ? extends T>, D extends KeyDomain, T> implements Key<K, D, T> {
+public class IndexedKey<K extends IndexedKey<K, ?, ?>, D extends KeyDomain, T> implements Key<K, D, T> {
 
     private static final ClassValue<DomainKeyDescriptor> DESCRIPTORS = new ClassValue<DomainKeyDescriptor>() {
         @SuppressWarnings("unchecked")

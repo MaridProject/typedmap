@@ -13,16 +13,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap;
+package org.marid.typedmap.examples;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.marid.typedmap.KeyDomain;
+import org.marid.typedmap.indexed.IndexedKey;
+
+import java.util.function.Supplier;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-public interface TypedMutableMap<D extends KeyDomain, K extends Key<?, ?>, V> extends TypedMap<D, K, V> {
+public class SampleKey<D extends KeyDomain, V> extends IndexedKey<D, V> {
 
-    @Nullable
-    <VAL extends V> VAL put(@Nonnull Key<? super D, VAL> key, @Nullable VAL value);
+    public SampleKey(Class<D> domain, Supplier<? extends V> defaultValueSupplier) {
+        super(domain, defaultValueSupplier);
+    }
 }

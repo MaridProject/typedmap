@@ -25,8 +25,7 @@ import java.util.function.BiConsumer;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedIndexed8KeySyncMap<D extends KeyDomain, K extends IndexedKey<K, ? super D, ? extends V>, V>
-        extends TypedIndexed8KeyMap<D, K, V> {
+public class TypedIndexed8KeySyncMap<D extends KeyDomain, K extends IndexedKey<?, ?>, V> extends TypedIndexed8KeyMap<D, K, V> {
 
     @Override
     public synchronized boolean containsValue(@Nonnull V value) {
@@ -50,13 +49,13 @@ public class TypedIndexed8KeySyncMap<D extends KeyDomain, K extends IndexedKey<K
 
     @Nullable
     @Override
-    public synchronized <VAL extends V> VAL get(@Nonnull Key<K, ? super D, VAL> key) {
+    public synchronized <VAL extends V> VAL get(@Nonnull Key<? super D, VAL> key) {
         return super.get(key);
     }
 
     @Nullable
     @Override
-    public synchronized <VAL extends V> VAL put(@Nonnull Key<K, ? super D, VAL> key, @Nullable VAL value) {
+    public synchronized <VAL extends V> VAL put(@Nonnull Key<? super D, VAL> key, @Nullable VAL value) {
         return super.put(key, value);
     }
 

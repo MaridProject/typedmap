@@ -26,7 +26,7 @@ import java.util.function.BiConsumer;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedIndexed8KeyMap<D extends KeyDomain, K extends IndexedKey<K, ? super D, ? extends V>, V>
+public class TypedIndexed8KeyMap<D extends KeyDomain, K extends IndexedKey<?, ?>, V>
         implements TypedMutableMap<D, K, V> {
 
     private long state;
@@ -45,7 +45,7 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, K extends IndexedKey<K, ? 
     public TypedIndexed8KeyMap() {
     }
 
-    private TypedIndexed8KeyMap(Key<K, ?, ?> key, V val) {
+    private TypedIndexed8KeyMap(Key<?, ?> key, V val) {
         state = key.getOrder();
         v0 = val;
     }
@@ -89,7 +89,7 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, K extends IndexedKey<K, ? 
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
-    public <VAL extends V> VAL get(@Nonnull Key<K, ? super D, VAL> key) {
+    public <VAL extends V> VAL get(@Nonnull Key<? super D, VAL> key) {
         final int order = key.getOrder();
         for (TypedIndexed8KeyMap<D, K, V> m = this; m != null; m = m.next) {
             final int index = find(order, m.state, m.size());
@@ -116,7 +116,7 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, K extends IndexedKey<K, ? 
 
     @Nullable
     @Override
-    public <VAL extends V> VAL put(@Nonnull Key<K, ? super D, VAL> key, @Nullable VAL value) {
+    public <VAL extends V> VAL put(@Nonnull Key<? super D, VAL> key, @Nullable VAL value) {
         final int order = key.getOrder();
         for (TypedIndexed8KeyMap<D, K, V> m = this; ; m = m.next) {
             final int n = m.size();
@@ -174,7 +174,7 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, K extends IndexedKey<K, ? 
     }
 
     @SuppressWarnings("unchecked")
-    private <VAL extends V> VAL setValue(int index, Key<K, ? super D, VAL> key, VAL value) {
+    private <VAL extends V> VAL setValue(int index, Key<? super D, VAL> key, VAL value) {
         final V old;
         switch (index) {
             case 0: old = v0; v0 = value; break;

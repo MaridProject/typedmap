@@ -13,16 +13,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap;
+package org.marid.typedmap.examples;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.marid.typedmap.indexed.TypedIndexed8KeyMap;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-public interface TypedMutableMap<D extends KeyDomain, K extends Key<?, ?>, V> extends TypedMap<D, K, V> {
+public class SampleKeyMapTest {
 
-    @Nullable
-    <VAL extends V> VAL put(@Nonnull Key<? super D, VAL> key, @Nullable VAL value);
+    private final TypedIndexed8KeyMap<AggregatedDomain, SampleKey<AggregatedDomain, Number>, Number> map = new TypedIndexed8KeyMap<>();
+
+    public void test1() {
+        map.put(Domain1.KEY1, 1);
+    }
 }

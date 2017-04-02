@@ -13,16 +13,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap;
+package org.marid.typedmap.examples;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.marid.typedmap.KeyDomain;
+
+import java.math.BigInteger;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-public interface TypedMutableMap<D extends KeyDomain, K extends Key<?, ?>, V> extends TypedMap<D, K, V> {
+public interface Domain2 extends KeyDomain {
 
-    @Nullable
-    <VAL extends V> VAL put(@Nonnull Key<? super D, VAL> key, @Nullable VAL value);
+    SampleKey<Domain2, BigInteger> KEY4 = new SampleKey<>(Domain2.class, () -> BigInteger.ONE);
 }

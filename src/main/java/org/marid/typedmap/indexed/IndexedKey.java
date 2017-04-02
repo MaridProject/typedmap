@@ -26,7 +26,7 @@ import java.util.function.Supplier;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class IndexedKey<K extends IndexedKey<K, ?, ?>, D extends KeyDomain, T> implements Key<K, D, T> {
+public class IndexedKey<D, T> implements Key<D, T> {
 
     private static final ClassValue<DomainKeyDescriptor> DESCRIPTORS = new ClassValue<DomainKeyDescriptor>() {
         @SuppressWarnings("unchecked")
@@ -69,8 +69,8 @@ public class IndexedKey<K extends IndexedKey<K, ?, ?>, D extends KeyDomain, T> i
     }
 
     @SuppressWarnings("unchecked")
-    public static <D extends KeyDomain, K extends IndexedKey<K, ? super D, ?>> Set<K> getKeys(Class<D> domain) {
-        final LinkedHashSet<K> keys = new LinkedHashSet<>();
+    public static <D extends KeyDomain> Set<IndexedKey<? super D, ?>> getKeys(Class<D> domain) {
+        final LinkedHashSet<IndexedKey<? super D, ?>> keys = new LinkedHashSet<>();
         final DomainKeyDescriptor descriptor = DESCRIPTORS.get(domain);
         synchronized (descriptor.type) {
             for (final DomainKeyDescriptor d : descriptor) {
@@ -83,7 +83,7 @@ public class IndexedKey<K extends IndexedKey<K, ?, ?>, D extends KeyDomain, T> i
     }
 
     @SuppressWarnings("unchecked")
-    static <K extends IndexedKey<K, ? super D, ?>, D extends KeyDomain> K getKey(Class<D> domain, int index) {
+    static <K extends IndexedKey<?, ?>, D extends KeyDomain> K getKey(Class<D> domain, int index) {
         final DomainKeyDescriptor descriptor = DESCRIPTORS.get(domain);
         synchronized (descriptor.type) {
             for (final DomainKeyDescriptor d : descriptor) {

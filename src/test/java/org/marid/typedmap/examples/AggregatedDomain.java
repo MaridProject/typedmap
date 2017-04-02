@@ -13,16 +13,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+package org.marid.typedmap.examples;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-public interface TypedMutableMap<D extends KeyDomain, K extends Key<?, ?>, V> extends TypedMap<D, K, V> {
-
-    @Nullable
-    <VAL extends V> VAL put(@Nonnull Key<? super D, VAL> key, @Nullable VAL value);
+public interface AggregatedDomain extends Domain1, Domain2 {
 }

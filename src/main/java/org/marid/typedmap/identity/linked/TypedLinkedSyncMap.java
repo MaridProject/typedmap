@@ -25,7 +25,7 @@ import java.util.function.BiConsumer;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedLinkedSyncMap<D extends KeyDomain, K extends Key<K, ? super D, ? extends V>, V>
+public class TypedLinkedSyncMap<D extends KeyDomain, K extends Key<? super D, ? extends V>, V>
         extends TypedLinkedMap<D, K, V> {
 
     @Override
@@ -50,13 +50,13 @@ public class TypedLinkedSyncMap<D extends KeyDomain, K extends Key<K, ? super D,
 
     @Nullable
     @Override
-    public synchronized <VAL extends V> VAL get(@Nonnull Key<K, ? super D, VAL> key) {
+    public synchronized <VAL extends V> VAL get(@Nonnull Key<? super D, VAL> key) {
         return super.get(key);
     }
 
     @Nullable
     @Override
-    public synchronized <VAL extends V> VAL put(@Nonnull Key<K, ? super D, VAL> key, @Nullable VAL value) {
+    public synchronized <VAL extends V> VAL put(@Nonnull Key<? super D, VAL> key, @Nullable VAL value) {
         return super.put(key, value);
     }
 

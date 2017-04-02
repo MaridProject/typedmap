@@ -20,7 +20,7 @@ import org.marid.typedmap.indexed.IndexedKey;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TestKey extends IndexedKey<TestKey, TestKeyDomain, Integer> {
+public class TestKey extends IndexedKey<TestKeyDomain, Integer> {
 
     public TestKey(Integer defaultValue) {
         super(TestKeyDomain.class, () -> defaultValue);

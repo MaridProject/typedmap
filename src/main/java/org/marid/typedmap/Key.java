@@ -20,15 +20,10 @@ import javax.annotation.Nullable;
 /**
  * @author Dmitry Ovchinnikov
  */
-public interface Key<K extends Key<K, ?, ?>, D extends KeyDomain, T> {
+public interface Key<D, T> {
 
     @Nullable
     T getDefault();
-
-    @SuppressWarnings("unchecked")
-    default K getKey() {
-        return (K) this;
-    }
 
     default int getOrder() {
         return System.identityHashCode(this);

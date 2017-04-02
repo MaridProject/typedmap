@@ -26,7 +26,7 @@ import java.util.function.BiConsumer;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedLinkedMap<D extends KeyDomain, K extends Key<K, ? super D, ? extends V>, V> implements TypedMutableMap<D, K, V> {
+public class TypedLinkedMap<D extends KeyDomain, K extends Key<?, ?>, V> implements TypedMutableMap<D, K, V> {
 
     private TypedLinkedMap<D, K, V> next;
     private K key;
@@ -67,7 +67,7 @@ public class TypedLinkedMap<D extends KeyDomain, K extends Key<K, ? super D, ? e
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
-    public <VAL extends V> VAL get(@Nonnull Key<K, ? super D, VAL> key) {
+    public <VAL extends V> VAL get(@Nonnull Key<? super D, VAL> key) {
         for (TypedLinkedMap<D, K, V> m = this; m != null; m = m.next) {
             if (m.key == key) {
                 return (VAL) m.value;
@@ -90,7 +90,7 @@ public class TypedLinkedMap<D extends KeyDomain, K extends Key<K, ? super D, ? e
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
-    public <VAL extends V> VAL put(@Nonnull Key<K, ? super D, VAL> key, @Nullable VAL value) {
+    public <VAL extends V> VAL put(@Nonnull Key<? super D, VAL> key, @Nullable VAL value) {
         if (this.key == null) {
             this.key = (K) key;
             this.value = value;
@@ -100,7 +100,7 @@ public class TypedLinkedMap<D extends KeyDomain, K extends Key<K, ? super D, ? e
             map.key = this.key;
             map.value = this.value;
             map.next = this.next;
-            this.key = key.getKey();
+            this.key = (K) key;
             this.value = value;
             this.next = map;
             return null;

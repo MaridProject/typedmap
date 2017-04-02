@@ -25,7 +25,7 @@ import java.util.function.BiConsumer;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedIndexed16KeySyncMap<D extends KeyDomain, K extends IndexedKey<K, ? super D, ? extends V>, V>
+public class TypedIndexed16KeySyncMap<D extends KeyDomain, K extends IndexedKey<?, ?>, V>
         extends TypedIndexed16KeyMap<D, K, V> {
 
     @Override
@@ -45,13 +45,13 @@ public class TypedIndexed16KeySyncMap<D extends KeyDomain, K extends IndexedKey<
 
     @Nullable
     @Override
-    public synchronized <VAL extends V> VAL get(@Nonnull Key<K, ? super D, VAL> key) {
+    public synchronized <VAL extends V> VAL get(@Nonnull Key<? super D, VAL> key) {
         return super.get(key);
     }
 
     @Nullable
     @Override
-    public synchronized <VAL extends V> VAL put(@Nonnull Key<K, ? super D, VAL> key, @Nullable VAL value) {
+    public synchronized <VAL extends V> VAL put(@Nonnull Key<? super D, VAL> key, @Nullable VAL value) {
         return super.put(key, value);
     }
 

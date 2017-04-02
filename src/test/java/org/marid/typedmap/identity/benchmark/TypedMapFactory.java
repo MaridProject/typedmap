@@ -21,6 +21,7 @@ import org.marid.typedmap.TypedMutableMap;
 import org.marid.typedmap.identity.linked.TypedLinkedSyncMap;
 import org.marid.typedmap.identity.wrapped.TypedWrappedMap;
 import org.marid.typedmap.indexed.TypedIndexed16KeySyncMap;
+import org.marid.typedmap.indexed.TypedIndexed8KeySyncMap;
 
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,7 +40,9 @@ interface TypedMapFactory {
                 return () -> new TypedWrappedMap<>(new ConcurrentHashMap<>());
             case "fus":
                 return (() -> new TypedWrappedMap<>(Collections.synchronizedMap(new Object2ObjectOpenHashMap<>())));
-            case "i255":
+            case "i8":
+                return TypedIndexed8KeySyncMap::new;
+            case "i16":
                 return TypedIndexed16KeySyncMap::new;
             default:
                 throw new IllegalArgumentException(type);

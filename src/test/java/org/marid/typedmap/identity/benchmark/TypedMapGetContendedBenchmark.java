@@ -68,7 +68,7 @@ public class TypedMapGetContendedBenchmark {
     @State(Scope.Benchmark)
     public static class CommonState {
 
-        @Param({"linked", "i255", "chash", "fus"})
+        @Param({"linked", "i16", "chash", "fus"})
         private String type;
 
         volatile TypedMutableMap<TestKeyDomain, Integer> map;

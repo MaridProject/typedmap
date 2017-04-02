@@ -60,7 +60,7 @@ public class TypedMapPutBenchmark {
     @State(Scope.Thread)
     public static class PutState {
 
-        @Param({"linked", "i255", "chash", "fus"})
+        @Param({"linked", "i16", "chash", "fus"})
         private String type;
 
         Supplier<TypedMutableMap<TestKeyDomain, Integer>> supplier;

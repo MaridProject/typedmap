@@ -26,7 +26,7 @@ import java.util.function.BiConsumer;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedLinkedMap<D extends KeyDomain, K extends Key<?, ?>, V> implements TypedMutableMap<D, K, V> {
+public class TypedLinkedMap<D extends KeyDomain, K extends Key, V> implements TypedMutableMap<D, K, V> {
 
     private TypedLinkedMap<D, K, V> next;
     private K key;

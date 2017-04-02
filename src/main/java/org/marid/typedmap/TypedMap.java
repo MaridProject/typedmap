@@ -22,7 +22,7 @@ import java.util.function.BiConsumer;
 /**
  * @author Dmitry Ovchinnikov
  */
-public interface TypedMap<D extends KeyDomain, K extends Key<?, ?>, V> {
+public interface TypedMap<D extends KeyDomain, K extends Key, V> {
 
     boolean containsKey(@Nonnull K key);
 

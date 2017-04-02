@@ -26,7 +26,7 @@ import java.util.function.BiConsumer;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedIndexed16KeyMap<D extends KeyDomain, K extends IndexedKey<?, ?>, V> implements TypedMutableMap<D, K, V> {
+public class TypedIndexed16KeyMap<D extends KeyDomain, K extends IndexedKey, V> implements TypedMutableMap<D, K, V> {
 
     private long s1;
     private long s2;

@@ -26,8 +26,7 @@ import java.util.function.BiConsumer;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedIndexed8KeyMap<D extends KeyDomain, K extends IndexedKey<?, ?>, V>
-        implements TypedMutableMap<D, K, V> {
+public class TypedIndexed8KeyMap<D extends KeyDomain, K extends IndexedKey, V> implements TypedMutableMap<D, K, V> {
 
     private long state;
 

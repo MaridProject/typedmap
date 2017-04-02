@@ -25,8 +25,7 @@ import java.util.function.BiConsumer;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedIndexed16KeySyncMap<D extends KeyDomain, K extends IndexedKey<?, ?>, V>
-        extends TypedIndexed16KeyMap<D, K, V> {
+public class TypedIndexed16KeySyncMap<D extends KeyDomain, K extends IndexedKey, V> extends TypedIndexed16KeyMap<D, K, V> {
 
     @Override
     public synchronized boolean isEmpty() {

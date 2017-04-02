@@ -25,8 +25,7 @@ import java.util.function.BiConsumer;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedLinkedSyncMap<D extends KeyDomain, K extends Key<? super D, ? extends V>, V>
-        extends TypedLinkedMap<D, K, V> {
+public class TypedLinkedSyncMap<D extends KeyDomain, K extends Key, V> extends TypedLinkedMap<D, K, V> {
 
     @Override
     public synchronized boolean containsValue(@Nonnull V value) {

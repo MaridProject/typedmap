@@ -15,8 +15,6 @@
 
 package org.marid.typedmap.examples;
 
-import org.marid.typedmap.KeyDomain;
-
 /**
  * @author Dmitry Ovchinnikov
  */

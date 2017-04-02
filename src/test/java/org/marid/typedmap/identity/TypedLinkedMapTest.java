@@ -29,6 +29,7 @@ import java.util.Random;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static java.util.Comparator.comparingInt;
 import static org.marid.typedmap.TestKeyDomain.TEST_KEYS;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
@@ -59,7 +60,7 @@ public class TypedLinkedMapTest {
         map.forEach(TestKeyDomain.class, (k, v) -> keys.add(k));
 
         final TestKey[] actual = keys.toArray(new TestKey[keys.size()]);
-        final TestKey[] expected = Stream.of(testKeys).sorted().toArray(TestKey[]::new);
+        final TestKey[] expected = Stream.of(testKeys).sorted(comparingInt(TestKey::getOrder)).toArray(TestKey[]::new);
 
         assertEquals(actual, expected);
     }

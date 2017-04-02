@@ -13,24 +13,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap;
+package org.marid.typedmap.examples;
 
-import javax.annotation.Nullable;
+import org.marid.typedmap.KeyDomain;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-public interface Key<K extends Key<K, ?, ?>, D extends KeyDomain, T> {
-
-    @Nullable
-    T getDefault();
-
-    @SuppressWarnings("unchecked")
-    default K getKey() {
-        return (K) this;
-    }
-
-    default int getOrder() {
-        return System.identityHashCode(this);
-    }
+public interface Domain1 extends KeyDomain {
 }

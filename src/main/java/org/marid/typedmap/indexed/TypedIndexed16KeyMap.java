@@ -62,8 +62,9 @@ public class TypedIndexed16KeyMap<D extends KeyDomain, K extends IndexedKey<K, ?
 
     @Override
     public boolean containsKey(@Nonnull K key) {
+        final int keyIndex = key.getOrder() + 1;
         for (TypedIndexed16KeyMap<D, K, V> m = this; m != null; m = m.next) {
-            final int index = find(key.getOrder() + 1, m.s1, m.s2, m.size());
+            final int index = find(keyIndex, m.s1, m.s2, m.size());
             if (index >= 0) {
                 return true;
             }
@@ -99,8 +100,9 @@ public class TypedIndexed16KeyMap<D extends KeyDomain, K extends IndexedKey<K, ?
     @Nullable
     @Override
     public <VAL extends V> VAL get(@Nonnull Key<K, ? super D, VAL> key) {
+        final int keyIndex = key.getOrder() + 1;
         for (TypedIndexed16KeyMap<D, K, V> m = this; m != null; m = m.next) {
-            final int index = find(key.getOrder() + 1, m.s1, m.s2, m.size());
+            final int index = find(keyIndex, m.s1, m.s2, m.size());
             if (index >= 0) {
                 return (VAL) m.getValue(index);
             }
@@ -125,10 +127,11 @@ public class TypedIndexed16KeyMap<D extends KeyDomain, K extends IndexedKey<K, ?
     @Nullable
     @Override
     public <VAL extends V> VAL put(@Nonnull Key<K, ? super D, VAL> key, @Nullable VAL value) {
+        final int keyIndex = key.getOrder() + 1;
         for (TypedIndexed16KeyMap<D, K, V> m = this; ; m = m.next) {
             final int n = m.size();
             final long v1 = m.s1, v2 = m.s2;
-            final int index = find(key.getOrder() + 1, v1, v2, n);
+            final int index = find(keyIndex, v1, v2, n);
             if (index >= 0) {
                 return m.setValue(index, key, value);
             } else if (n < 16) {
@@ -136,7 +139,7 @@ public class TypedIndexed16KeyMap<D extends KeyDomain, K extends IndexedKey<K, ?
                 for (int i = n; i > pos; i--) {
                     m.setValue(i, key(v1, v2, i - 1), m.getValue(i - 1));
                 }
-                m.setValue(pos, key.getOrder() + 1, value);
+                m.setValue(pos, keyIndex, value);
                 return null;
             } else if (m.next == null) {
                 m.next = new TypedIndexed16KeyMap<>(key, value);

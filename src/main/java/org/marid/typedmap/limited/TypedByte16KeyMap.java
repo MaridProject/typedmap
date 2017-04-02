@@ -13,7 +13,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap.indexed;
+package org.marid.typedmap.limited;
 
 import org.marid.typedmap.Key;
 import org.marid.typedmap.KeyDomain;
@@ -25,9 +25,10 @@ import javax.annotation.Nullable;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedIndexed8KeyMap<D extends KeyDomain, V> implements TypedMutableMap<D, V> {
+public class TypedByte16KeyMap<D extends KeyDomain, V> implements TypedMutableMap<D, V> {
 
-    private long state;
+    private long s1;
+    private long s2;
 
     private V v0;
     private V v1;
@@ -38,21 +39,30 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, V> implements TypedMutable
     private V v6;
     private V v7;
 
-    TypedIndexed8KeyMap<D, V> next;
+    private V v8;
+    private V v9;
+    private V v10;
+    private V v11;
+    private V v12;
+    private V v13;
+    private V v14;
+    private V v15;
 
-    public TypedIndexed8KeyMap() {
+    TypedByte16KeyMap<D, V> next;
+
+    public TypedByte16KeyMap() {
     }
 
-    private TypedIndexed8KeyMap(Key<?, ?> key, V val) {
-        state = key.getOrder();
+    private TypedByte16KeyMap(Key<?, ?> key, V val) {
+        s1 = key.getOrder();
         v0 = val;
     }
 
     @Override
     public boolean containsKey(@Nonnull Key<? extends D, V> key) {
         final int order = key.getOrder();
-        for (TypedIndexed8KeyMap<D, V> m = this; m != null; m = m.next) {
-            final int index = find(order, m.state, m.size());
+        for (TypedByte16KeyMap<D, V> m = this; m != null; m = m.next) {
+            final int index = find(order, m.s1, m.s2, m.size());
             if (index >= 0) {
                 return true;
             }
@@ -62,12 +72,12 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, V> implements TypedMutable
 
     @Override
     public int size() {
-        return 8 - Long.numberOfLeadingZeros(state) / 8;
+        return 16 - Long.numberOfLeadingZeros(s1) / 8 - Long.numberOfLeadingZeros(s2) / 8;
     }
 
     @Override
     public boolean isEmpty() {
-        return state == 0;
+        return s1 == 0 && s2 == 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -75,8 +85,8 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, V> implements TypedMutable
     @Override
     public <VAL extends V> VAL get(@Nonnull Key<? extends D, VAL> key) {
         final int order = key.getOrder();
-        for (TypedIndexed8KeyMap<D, V> m = this; m != null; m = m.next) {
-            final int index = find(order, m.state, m.size());
+        for (TypedByte16KeyMap<D, V> m = this; m != null; m = m.next) {
+            final int index = find(order, m.s1, m.s2, m.size());
             if (index >= 0) {
                 return (VAL) m.getValue(index);
             }
@@ -88,21 +98,21 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, V> implements TypedMutable
     @Override
     public <VAL extends V> VAL put(@Nonnull Key<? extends D, VAL> key, @Nullable VAL value) {
         final int order = key.getOrder();
-        for (TypedIndexed8KeyMap<D, V> m = this; ; m = m.next) {
+        for (TypedByte16KeyMap<D, V> m = this; ; m = m.next) {
             final int n = m.size();
-            final long v = m.state;
-            final int index = find(order, v, n);
+            final long v1 = m.s1, v2 = m.s2;
+            final int index = find(order, v1, v2, n);
             if (index >= 0) {
                 return m.setValue(index, key, value);
-            } else if (n < 8) {
+            } else if (n < 16) {
                 final int pos = -(index + 1);
                 for (int i = n; i > pos; i--) {
-                    m.setValue(i, key(v, i - 1), m.getValue(i - 1));
+                    m.setValue(i, key(v1, v2, i - 1), m.getValue(i - 1));
                 }
                 m.setValue(pos, order, value);
                 return null;
             } else if (m.next == null) {
-                m.next = new TypedIndexed8KeyMap<>(key, value);
+                m.next = new TypedByte16KeyMap<>(key, value);
                 return null;
             }
         }
@@ -119,6 +129,14 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, V> implements TypedMutable
             case 5: return v5;
             case 6: return v6;
             case 7: return v7;
+            case 8: return v8;
+            case 9: return v9;
+            case 10: return v10;
+            case 11: return v11;
+            case 12: return v12;
+            case 13: return v13;
+            case 14: return v14;
+            case 15: return v15;
             default: throw new IndexOutOfBoundsException(Integer.toString(index));
         }
     }
@@ -133,14 +151,27 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, V> implements TypedMutable
             case 5: v5 = value; break;
             case 6: v6 = value; break;
             case 7: v7 = value; break;
+            case 8: v8 = value; break;
+            case 9: v9 = value; break;
+            case 10: v10 = value; break;
+            case 11: v11 = value; break;
+            case 12: v12 = value; break;
+            case 13: v13 = value; break;
+            case 14: v14 = value; break;
+            case 15: v15 = value; break;
             default: throw new IndexOutOfBoundsException(Integer.toString(index));
         }
         updateState(index, key);
     }
 
     private void updateState(int index, int key) {
-        final int offset = index * 8;
-        state = (state & ~(0xFFL << offset)) | ((long) key << offset);
+        if (index < 8) {
+            final int offset = index * 8;
+            s1 = (s1 & ~(0xFFL << offset)) | ((long) key << offset);
+        } else {
+            final int offset = (index - 8) * 8;
+            s2 = (s2 & ~(0xFFL << offset)) | ((long) key << offset);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -155,24 +186,37 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, V> implements TypedMutable
             case 5: old = v5; v5 = value; break;
             case 6: old = v6; v6 = value; break;
             case 7: old = v7; v7 = value; break;
+            case 8: old = v8; v8 = value; break;
+            case 9: old = v9; v9 = value; break;
+            case 10: old = v10; v10 = value; break;
+            case 11: old = v11; v11 = value; break;
+            case 12: old = v12; v12 = value; break;
+            case 13: old = v13; v13 = value; break;
+            case 14: old = v14; v14 = value; break;
+            case 15: old = v15; v15 = value; break;
             default: throw new IndexOutOfBoundsException(Integer.toString(index));
         }
         updateState(index, key.getOrder());
         return (VAL) old;
     }
 
-    private static int key(long v, int index) {
-        final int offset = 8 * index;
-        return (int) ((v & (0xFFL << offset)) >>> offset);
+    private static int key(long v1, long v2, int index) {
+        if (index < 8) {
+            final int offset = 8 * index;
+            return (int) ((v1 & (0xFFL << offset)) >>> offset);
+        } else {
+            final int offset = 8 * (index - 8);
+            return (int) ((v2 & (0xFFL << offset)) >>> offset);
+        }
     }
 
-    private static int find(int key, long v, int size) {
+    private static int find(int key, long v1, long v2, int size) {
         int low = 0;
         int high = size - 1;
 
         while (low <= high) {
             final int mid = (low + high) >>> 1;
-            final int midVal = key(v, mid);
+            final int midVal = key(v1, v2, mid);
 
             if (midVal < key) low = mid + 1;
             else if (midVal > key) high = mid - 1;

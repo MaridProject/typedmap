@@ -13,7 +13,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap.indexed;
+package org.marid.typedmap.limited;
 
 import org.marid.typedmap.TestKeyDomain;
 import org.testng.annotations.DataProvider;
@@ -26,7 +26,7 @@ import static org.testng.Assert.assertEquals;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedIndexedKeyMapTest {
+public class TypedByteKeyMapTest {
 
     @DataProvider
     public Object[][] indexed8Data() {
@@ -44,12 +44,12 @@ public class TypedIndexedKeyMapTest {
 
     @Test(dataProvider = "indexed8Data")
     public void testBatch8Size(int entries, int expectedSize) {
-        final TypedIndexed8KeyMap<TestKeyDomain, Integer> map = new TypedIndexed8KeyMap<>();
+        final TypedByte8KeyMap<TestKeyDomain, Integer> map = new TypedByte8KeyMap<>();
 
         IntStream.range(0, entries).forEach(i -> map.put(TestKeyDomain.TEST_KEYS[i], i));
 
         int actualSize = 0;
-        for (TypedIndexed8KeyMap<TestKeyDomain, Integer> m = map; m != null; m = m.next) {
+        for (TypedByte8KeyMap<TestKeyDomain, Integer> m = map; m != null; m = m.next) {
             actualSize++;
         }
 
@@ -71,12 +71,12 @@ public class TypedIndexedKeyMapTest {
 
     @Test(dataProvider = "indexed16Data")
     public void testBatch16Size(int entries, int expectedSize) {
-        final TypedIndexed16KeyMap<TestKeyDomain, Integer> map = new TypedIndexed16KeyMap<>();
+        final TypedByte16KeyMap<TestKeyDomain, Integer> map = new TypedByte16KeyMap<>();
 
         IntStream.range(0, entries).forEach(i -> map.put(TestKeyDomain.TEST_KEYS[i], i));
 
         int actualSize = 0;
-        for (TypedIndexed16KeyMap<TestKeyDomain, Integer> m = map; m != null; m = m.next) {
+        for (TypedByte16KeyMap<TestKeyDomain, Integer> m = map; m != null; m = m.next) {
             actualSize++;
         }
 

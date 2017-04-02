@@ -13,7 +13,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap.indexed;
+package org.marid.typedmap.limited;
 
 import org.marid.typedmap.Key;
 import org.marid.typedmap.KeyDomain;
@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TypedIndexed16KeySyncMap<D extends KeyDomain, V> extends TypedIndexed16KeyMap<D, V> {
+public class TypedByte16KeySyncMap<D extends KeyDomain, V> extends TypedByte16KeyMap<D, V> {
 
     @Override
     public synchronized boolean isEmpty() {

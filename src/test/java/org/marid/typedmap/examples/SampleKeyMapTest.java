@@ -15,7 +15,7 @@
 
 package org.marid.typedmap.examples;
 
-import org.marid.typedmap.indexed.TypedIndexed8KeyMap;
+import org.marid.typedmap.limited.TypedByte8KeyMap;
 import org.testng.annotations.Test;
 
 import java.math.BigInteger;
@@ -27,7 +27,7 @@ import static org.testng.Assert.assertEquals;
  */
 public class SampleKeyMapTest {
 
-    private final TypedIndexed8KeyMap<AggregatedDomain, Number> map = new TypedIndexed8KeyMap<>();
+    private final TypedByte8KeyMap<AggregatedDomain, Number> map = new TypedByte8KeyMap<>();
 
     @Test
     public void test1() {

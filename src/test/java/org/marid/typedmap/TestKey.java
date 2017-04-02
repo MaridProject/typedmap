@@ -15,12 +15,10 @@
 
 package org.marid.typedmap;
 
-import org.marid.typedmap.indexed.IndexedKey;
-
 /**
  * @author Dmitry Ovchinnikov
  */
-public class TestKey extends IndexedKey<TestKeyDomain, Integer> {
+public class TestKey extends Key<TestKeyDomain, Integer> {
 
     public TestKey(Integer defaultValue) {
         super(TestKeyDomain.class, () -> defaultValue);

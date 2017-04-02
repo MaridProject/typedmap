@@ -15,15 +15,15 @@
 
 package org.marid.typedmap.examples;
 
+import org.marid.typedmap.Key;
 import org.marid.typedmap.KeyDomain;
-import org.marid.typedmap.indexed.IndexedKey;
 
 import java.util.function.Supplier;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-public class SampleKey<D extends KeyDomain, V> extends IndexedKey<D, V> {
+public class SampleKey<D extends KeyDomain, V> extends Key<D, V> {
 
     public SampleKey(Class<D> domain, Supplier<? extends V> defaultValueSupplier) {
         super(domain, defaultValueSupplier);

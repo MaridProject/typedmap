@@ -49,7 +49,7 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, V> implements TypedMutable
     }
 
     @Override
-    public boolean containsKey(@Nonnull Key<? super D, V> key) {
+    public boolean containsKey(@Nonnull Key<? extends D, V> key) {
         final int order = key.getOrder();
         for (TypedIndexed8KeyMap<D, V> m = this; m != null; m = m.next) {
             final int index = find(order, m.state, m.size());
@@ -73,7 +73,7 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, V> implements TypedMutable
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
-    public <VAL extends V> VAL get(@Nonnull Key<? super D, VAL> key) {
+    public <VAL extends V> VAL get(@Nonnull Key<? extends D, VAL> key) {
         final int order = key.getOrder();
         for (TypedIndexed8KeyMap<D, V> m = this; m != null; m = m.next) {
             final int index = find(order, m.state, m.size());
@@ -86,7 +86,7 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, V> implements TypedMutable
 
     @Nullable
     @Override
-    public <VAL extends V> VAL put(@Nonnull Key<? super D, VAL> key, @Nullable VAL value) {
+    public <VAL extends V> VAL put(@Nonnull Key<? extends D, VAL> key, @Nullable VAL value) {
         final int order = key.getOrder();
         for (TypedIndexed8KeyMap<D, V> m = this; ; m = m.next) {
             final int n = m.size();
@@ -144,7 +144,7 @@ public class TypedIndexed8KeyMap<D extends KeyDomain, V> implements TypedMutable
     }
 
     @SuppressWarnings("unchecked")
-    private <VAL extends V> VAL setValue(int index, Key<? super D, VAL> key, VAL value) {
+    private <VAL extends V> VAL setValue(int index, Key<? extends D, VAL> key, VAL value) {
         final V old;
         switch (index) {
             case 0: old = v0; v0 = value; break;

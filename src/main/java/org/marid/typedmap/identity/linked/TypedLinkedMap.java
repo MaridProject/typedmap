@@ -28,11 +28,11 @@ import javax.annotation.Nullable;
 public class TypedLinkedMap<D extends KeyDomain, V> implements TypedMutableMap<D, V> {
 
     TypedLinkedMap<D, V> next;
-    Key<? super D, ? extends V> key;
+    Key<? extends D, ? extends V> key;
     V value;
 
     @Override
-    public boolean containsKey(@Nonnull Key<? super D, V> key) {
+    public boolean containsKey(@Nonnull Key<? extends D, V> key) {
         for (TypedLinkedMap<D, V> m = this; m != null; m = m.next) {
             if (m.key == key) {
                 return true;
@@ -56,7 +56,7 @@ public class TypedLinkedMap<D extends KeyDomain, V> implements TypedMutableMap<D
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
-    public <VAL extends V> VAL get(@Nonnull Key<? super D, VAL> key) {
+    public <VAL extends V> VAL get(@Nonnull Key<? extends D, VAL> key) {
         for (TypedLinkedMap<D, V> m = this; m != null; m = m.next) {
             if (m.key == key) {
                 return (VAL) m.value;
@@ -70,7 +70,7 @@ public class TypedLinkedMap<D extends KeyDomain, V> implements TypedMutableMap<D
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
-    public <VAL extends V> VAL put(@Nonnull Key<? super D, VAL> key, @Nullable VAL value) {
+    public <VAL extends V> VAL put(@Nonnull Key<? extends D, VAL> key, @Nullable VAL value) {
         if (this.key == null) {
             this.key = key;
             this.value = value;

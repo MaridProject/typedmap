@@ -15,14 +15,12 @@
 
 package org.marid.typedmap.examples;
 
-import org.marid.typedmap.KeyDomain;
-
 import java.math.BigInteger;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-public interface Domain2 extends KeyDomain {
+public interface Domain2 extends AggregatedDomain {
 
     SampleKey<Domain2, BigInteger> KEY4 = new SampleKey<>(Domain2.class, () -> BigInteger.ONE);
 }

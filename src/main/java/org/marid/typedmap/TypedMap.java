@@ -23,12 +23,12 @@ import javax.annotation.Nullable;
  */
 public interface TypedMap<D extends KeyDomain, V> {
 
-    boolean containsKey(@Nonnull Key<? super D, V> key);
+    boolean containsKey(@Nonnull Key<? extends D, V> key);
 
     int size();
 
     boolean isEmpty();
 
     @Nullable
-    <VAL extends V> VAL get(@Nonnull Key<? super D, VAL> key);
+    <VAL extends V> VAL get(@Nonnull Key<? extends D, VAL> key);
 }

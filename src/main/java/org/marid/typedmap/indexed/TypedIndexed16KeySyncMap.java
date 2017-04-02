@@ -38,12 +38,17 @@ public class TypedIndexed16KeySyncMap<D extends KeyDomain, V> extends TypedIndex
 
     @Nullable
     @Override
-    public synchronized <VAL extends V> VAL put(@Nonnull Key<? super D, VAL> key, @Nullable VAL value) {
+    public synchronized <VAL extends V> VAL get(@Nonnull Key<? extends D, VAL> key) {
+        return super.get(key);
+    }
+    @Nullable
+    @Override
+    public synchronized <VAL extends V> VAL put(@Nonnull Key<? extends D, VAL> key, @Nullable VAL value) {
         return super.put(key, value);
     }
 
     @Override
-    public synchronized boolean containsKey(@Nonnull Key<? super D, V> key) {
+    public synchronized boolean containsKey(@Nonnull Key<? extends D, V> key) {
         return super.containsKey(key);
     }
 }

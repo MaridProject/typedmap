@@ -17,8 +17,12 @@ package org.marid.typedmap.examples;
 
 import org.marid.typedmap.KeyDomain;
 
+import java.math.BigInteger;
+
 /**
  * @author Dmitry Ovchinnikov
  */
 public interface Domain3 extends KeyDomain {
+
+    SampleKey<Domain3, BigInteger> KEY5 = new SampleKey<>(Domain3.class, () -> BigInteger.ONE);
 }

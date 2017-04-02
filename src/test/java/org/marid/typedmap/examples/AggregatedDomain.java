@@ -15,8 +15,10 @@
 
 package org.marid.typedmap.examples;
 
+import org.marid.typedmap.KeyDomain;
+
 /**
  * @author Dmitry Ovchinnikov
  */
-public interface AggregatedDomain extends Domain1, Domain2 {
+public interface AggregatedDomain extends KeyDomain {
 }

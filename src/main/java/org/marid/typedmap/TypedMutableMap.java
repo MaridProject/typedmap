@@ -24,5 +24,5 @@ import javax.annotation.Nullable;
 public interface TypedMutableMap<D extends KeyDomain, V> extends TypedMap<D, V> {
 
     @Nullable
-    <VAL extends V> VAL put(@Nonnull Key<? super D, VAL> key, @Nullable VAL value);
+    <VAL extends V> VAL put(@Nonnull Key<? extends D, VAL> key, @Nullable VAL value);
 }

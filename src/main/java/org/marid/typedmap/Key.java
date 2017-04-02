@@ -19,6 +19,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * @author Dmitry Ovchinnikov
@@ -39,7 +40,7 @@ public class Key<D extends KeyDomain, T> {
 
     public Key(Class<D> domain, Supplier<? extends T> defaultValueSupplier) {
         this.domain = domain;
-        this.index = DESCRIPTORS.get(domain).add(this);
+        this.index = DESCRIPTORS.get(getBaseType(domain)).add(this);
         this.defaultValueSupplier = defaultValueSupplier;
     }
 
@@ -65,8 +66,8 @@ public class Key<D extends KeyDomain, T> {
     }
 
     @SuppressWarnings("unchecked")
-    public static <D extends KeyDomain> Set<Key<? super D, ?>> getKeys(Class<D> domain) {
-        final LinkedHashSet<Key<? super D, ?>> keys = new LinkedHashSet<>();
+    public static <D extends KeyDomain> Set<Key<? extends D, ?>> getKeys(Class<D> domain) {
+        final LinkedHashSet<Key<? extends D, ?>> keys = new LinkedHashSet<>();
         final DomainKeyDescriptor descriptor = DESCRIPTORS.get(domain);
         synchronized (descriptor.type) {
             for (final DomainKeyDescriptor d : descriptor) {
@@ -99,6 +100,20 @@ public class Key<D extends KeyDomain, T> {
         return defaultValueSupplier.get();
     }
 
+    @SuppressWarnings("unchecked")
+    private static Class<? extends KeyDomain> getBaseType(Class<? extends KeyDomain> domain) {
+        if (!domain.isInterface()) {
+            throw new IllegalArgumentException("Not interface: " + domain);
+        }
+        return Stream.of(domain.getInterfaces())
+                .filter(KeyDomain.class::isAssignableFrom)
+                .map(i -> (Class<? extends KeyDomain>) i)
+                .filter(i -> Stream.of(i.getInterfaces())
+                        .noneMatch(c -> c != KeyDomain.class && KeyDomain.class.isAssignableFrom(c)))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Invalid type: " + domain));
+    }
+
     private static class DomainKeyDescriptor implements Iterable<DomainKeyDescriptor> {
 
         private final Class<? extends KeyDomain> type;
@@ -111,8 +126,7 @@ public class Key<D extends KeyDomain, T> {
 
         private int add(Key key) {
             synchronized (type) {
-                final Class<?> oldClass = keys.put(key, key.domain);
-                assert oldClass == null : "Duplicated key for " + oldClass;
+                keys.put(key, key.domain);
                 final int id = getKeys(type).size();
                 byIndex.put(id, key);
                 return id;

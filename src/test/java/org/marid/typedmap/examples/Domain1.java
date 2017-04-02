@@ -20,7 +20,7 @@ import org.marid.typedmap.KeyDomain;
 /**
  * @author Dmitry Ovchinnikov
  */
-public interface Domain1 extends KeyDomain {
+public interface Domain1 extends AggregatedDomain {
 
     SampleKey<Domain1, Integer> KEY1 = new SampleKey<>(Domain1.class, () -> 1);
     SampleKey<Domain1, Integer> KEY2 = new SampleKey<>(Domain1.class, () -> 2);

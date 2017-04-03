@@ -43,8 +43,8 @@ public class TypedByte8KeyMap<D extends KeyDomain, V> implements TypedMutableMap
     public TypedByte8KeyMap() {
     }
 
-    private TypedByte8KeyMap(Key<?, ?> key, V val) {
-        state = key.getOrder();
+    private TypedByte8KeyMap(int key, V val) {
+        state = key;
         v0 = val;
     }
 
@@ -84,21 +84,25 @@ public class TypedByte8KeyMap<D extends KeyDomain, V> implements TypedMutableMap
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     @Nullable
     @Override
     public <VAL extends V> VAL put(@Nonnull Key<? extends D, VAL> key, @Nullable VAL value) {
-        final int order = key.getOrder();
+        return value == null ? (VAL) remove(key.getOrder()) : (VAL) put0(key.getOrder(), value);
+    }
+
+    private V put0(int key, @Nonnull V value) {
         for (TypedByte8KeyMap<D, V> m = this; ; m = m.next) {
             final int n = m.size();
-            final int index = m.find(order, n);
+            final int index = m.find(key, n);
             if (index >= 0) {
-                return m.setValue(index, key, value);
+                return m.getAndSet(index, key, value);
             } else if (n < 8) {
                 final int pos = -(index + 1);
                 for (int i = n; i > pos; i--) {
                     m.setValue(i, m.key(i - 1), m.getValue(i - 1));
                 }
-                m.setValue(pos, order, value);
+                m.setValue(pos, key, value);
                 return null;
             } else if (m.next == null) {
                 m.next = new TypedByte8KeyMap<>(key, value);
@@ -107,7 +111,41 @@ public class TypedByte8KeyMap<D extends KeyDomain, V> implements TypedMutableMap
         }
     }
 
-    @SuppressWarnings("unchecked")
+    private V remove(int key) {
+        for (TypedByte8KeyMap<D, V> p = null, m = this; m != null; p = m, m = m.next) {
+            final int n = m.size();
+            final int index = m.find(key, n);
+            if (index >= 0) {
+                final V old = m.getValue(index);
+                for (int i = index + 1; i < n; i++) {
+                    m.setValue(i - 1, m.key(i), m.getValue(i));
+                }
+                m.setValue(n - 1, 0, null);
+                final TypedByte8KeyMap<D, V> found = m;
+                while (m.next != null) {
+                    p = m;
+                    m = m.next;
+                }
+                final int lastSize = m.size();
+                if (lastSize == 0) {
+                    if (p != null) {
+                        p.next = null;
+                    }
+                    return old;
+                }
+                final int lastKey = m.key(lastSize - 1);
+                final V lastValue = m.getValue(lastSize - 1);
+                m.setValue(m.size() - 1, 0, null);
+                found.put0(lastKey, lastValue);
+                if (m.isEmpty() && p != null) {
+                    p.next = null;
+                }
+                return old;
+            }
+        }
+        return null;
+    }
+
     private V getValue(int index) {
         switch (index) {
             case 0: return v0;
@@ -142,8 +180,7 @@ public class TypedByte8KeyMap<D extends KeyDomain, V> implements TypedMutableMap
         state = (state & ~(0xFFL << offset)) | ((long) key << offset);
     }
 
-    @SuppressWarnings("unchecked")
-    private <VAL extends V> VAL setValue(int index, Key<? extends D, VAL> key, VAL value) {
+    private V getAndSet(int index, int key, V value) {
         final V old;
         switch (index) {
             case 0: old = v0; v0 = value; break;
@@ -156,8 +193,8 @@ public class TypedByte8KeyMap<D extends KeyDomain, V> implements TypedMutableMap
             case 7: old = v7; v7 = value; break;
             default: throw new IndexOutOfBoundsException(Integer.toString(index));
         }
-        updateState(index, key.getOrder());
-        return (VAL) old;
+        updateState(index, key);
+        return old;
     }
 
     private int key(int index) {

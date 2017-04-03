@@ -13,21 +13,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.marid.typedmap.limited;
 
 import org.marid.typedmap.Key;
@@ -210,30 +195,14 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
     private void updateState(int index, int key) {
         final int offset = (index % 4) * 16;
         switch (index / 4) {
-            case 0:
-                s0 = (s0 & ~(0xFFFFL << offset)) | ((long) key << offset);
-                break;
-            case 1:
-                s1 = (s1 & ~(0xFFFFL << offset)) | ((long) key << offset);
-                break;
-            case 2:
-                s2 = (s2 & ~(0xFFFFL << offset)) | ((long) key << offset);
-                break;
-            case 3:
-                s3 = (s3 & ~(0xFFFFL << offset)) | ((long) key << offset);
-                break;
-            case 4:
-                s4 = (s4 & ~(0xFFFFL << offset)) | ((long) key << offset);
-                break;
-            case 5:
-                s5 = (s5 & ~(0xFFFFL << offset)) | ((long) key << offset);
-                break;
-            case 6:
-                s6 = (s6 & ~(0xFFFFL << offset)) | ((long) key << offset);
-                break;
-            case 7:
-                s7 = (s7 & ~(0xFFFFL << offset)) | ((long) key << offset);
-                break;
+            case 0: s0 = (s0 & ~(0xFFFFL << offset)) | ((long) key << offset); break;
+            case 1: s1 = (s1 & ~(0xFFFFL << offset)) | ((long) key << offset); break;
+            case 2: s2 = (s2 & ~(0xFFFFL << offset)) | ((long) key << offset); break;
+            case 3: s3 = (s3 & ~(0xFFFFL << offset)) | ((long) key << offset); break;
+            case 4: s4 = (s4 & ~(0xFFFFL << offset)) | ((long) key << offset); break;
+            case 5: s5 = (s5 & ~(0xFFFFL << offset)) | ((long) key << offset); break;
+            case 6: s6 = (s6 & ~(0xFFFFL << offset)) | ((long) key << offset); break;
+            case 7: s7 = (s7 & ~(0xFFFFL << offset)) | ((long) key << offset); break;
         }
     }
 
@@ -274,8 +243,6 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
             case 29: v29 = value; break;
             case 30: v30 = value; break;
             case 31: v31 = value; break;
-
-            default: throw new IndexOutOfBoundsException(Integer.toString(index));
         }
         updateState(index, key);
     }
@@ -329,24 +296,15 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
     private int key(int index) {
         final int offset = (index % 4) * 16;
         switch (index / 4) {
-            case 0:
-                return (int) ((s0 & (0xFFFFL << offset)) >>> offset);
-            case 1:
-                return (int) ((s1 & (0xFFFFL << offset)) >>> offset);
-            case 2:
-                return (int) ((s2 & (0xFFFFL << offset)) >>> offset);
-            case 3:
-                return (int) ((s3 & (0xFFFFL << offset)) >>> offset);
-            case 4:
-                return (int) ((s4 & (0xFFFFL << offset)) >>> offset);
-            case 5:
-                return (int) ((s5 & (0xFFFFL << offset)) >>> offset);
-            case 6:
-                return (int) ((s6 & (0xFFFFL << offset)) >>> offset);
-            case 7:
-                return (int) ((s7 & (0xFFFFL << offset)) >>> offset);
-            default:
-                throw new IllegalArgumentException(Integer.toString(index));
+            case 0: return (int) ((s0 & (0xFFFFL << offset)) >>> offset);
+            case 1: return (int) ((s1 & (0xFFFFL << offset)) >>> offset);
+            case 2: return (int) ((s2 & (0xFFFFL << offset)) >>> offset);
+            case 3: return (int) ((s3 & (0xFFFFL << offset)) >>> offset);
+            case 4: return (int) ((s4 & (0xFFFFL << offset)) >>> offset);
+            case 5: return (int) ((s5 & (0xFFFFL << offset)) >>> offset);
+            case 6: return (int) ((s6 & (0xFFFFL << offset)) >>> offset);
+            case 7: return (int) ((s7 & (0xFFFFL << offset)) >>> offset);
+            default: throw new IllegalArgumentException(Integer.toString(index));
         }
     }
 

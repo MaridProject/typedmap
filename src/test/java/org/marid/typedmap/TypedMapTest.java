@@ -15,12 +15,13 @@
 
 package org.marid.typedmap;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrays;
 import org.apache.commons.math3.util.Pair;
 import org.marid.typedmap.identity.linked.TypedLinkedMap;
 import org.marid.typedmap.identity.wrapped.TypedWrappedMap;
 import org.marid.typedmap.limited.TypedByte16KeyMap;
-import org.marid.typedmap.limited.TypedShort32KeyMap;
 import org.marid.typedmap.limited.TypedByte8KeyMap;
+import org.marid.typedmap.limited.TypedShort32KeyMap;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -28,8 +29,8 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toMap;
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -68,22 +69,50 @@ public class TypedMapTest {
     }
 
     @Test(dataProvider = "setsOfEntries")
-    public void test(TypedMutableMap<TestKeyDomain, Integer> map, List<Pair<TestKey, Integer>> pairs) {
-        final Map<TestKey, Integer> expectedMap = pairs.stream()
-                .collect(toMap(Pair::getKey, Pair::getValue, (v1, v2) -> v2));
+    public void testPut(TypedMutableMap<TestKeyDomain, Integer> map, List<Pair<TestKey, Integer>> pairs) {
+        final Map<TestKey, Integer> expectedMap = new TreeMap<>(Comparator.comparingInt(TestKey::getOrder));
 
-        pairs.forEach(p -> map.put(p.getKey(), p.getValue()));
+        pairs.forEach(p -> {
+            expectedMap.put(p.getKey(), p.getValue());
+            map.put(p.getKey(), p.getValue());
+        });
 
-        final Map<TestKey, Integer> actualMap = new HashMap<>();
-        for (final TestKey testKey : TestKeyDomain.TEST_KEYS) {
-            if (map.containsKey(testKey)) {
-                final Integer value = map.get(testKey);
-                if (value != null) {
-                    actualMap.put(testKey, value);
-                }
-            }
-        }
+        final Map<TestKey, Integer> actualMap = Stream.of(TestKeyDomain.TEST_KEYS)
+                .filter(map::containsKey)
+                .map(k -> new Pair<>(k, map.get(k)))
+                .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
 
         assertEquals(actualMap, expectedMap);
+    }
+
+    @Test(dataProvider = "setsOfEntries")
+    public void testRemove(TypedMutableMap<TestKeyDomain, Integer> map, List<Pair<TestKey, Integer>> pairs) {
+        final Map<TestKey, Integer> expectedMap = new TreeMap<>(Comparator.comparingInt(TestKey::getOrder));
+
+        pairs.forEach(p -> {
+            expectedMap.put(p.getKey(), p.getValue());
+            map.put(p.getKey(), p.getValue());
+        });
+
+        final TestKey[] keys = TestKeyDomain.TEST_KEYS.clone();
+        ObjectArrays.shuffle(keys, new Random(0L));
+
+        for (final TestKey key : keys) {
+            try {
+                expectedMap.remove(key);
+                map.put(key, null);
+
+                final TreeMap<TestKey, Integer> actualMap = new TreeMap<>(Comparator.comparingInt(TestKey::getOrder));
+                for (final TestKey k : TestKeyDomain.TEST_KEYS) {
+                    if (map.containsKey(k) && map.get(k) != null) {
+                        actualMap.put(k, map.get(k));
+                    }
+                }
+
+                assertEquals(actualMap, expectedMap);
+            } catch (Exception x) {
+                x.printStackTrace();
+            }
+        }
     }
 }

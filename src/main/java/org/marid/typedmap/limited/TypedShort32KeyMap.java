@@ -42,6 +42,7 @@ import javax.annotation.Nullable;
  */
 public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableMap<D, V> {
 
+    private long s0;
     private long s1;
     private long s2;
     private long s3;
@@ -49,7 +50,6 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
     private long s5;
     private long s6;
     private long s7;
-    private long s8;
 
     private V v0;
     private V v1;
@@ -93,7 +93,7 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
     }
 
     private TypedShort32KeyMap(Key<?, ?> key, V val) {
-        s1 = key.getOrder();
+        s0 = key.getOrder();
         v0 = val;
     }
 
@@ -101,7 +101,7 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
     public boolean containsKey(@Nonnull Key<? extends D, V> key) {
         final int order = key.getOrder();
         for (TypedShort32KeyMap<D, V> m = this; m != null; m = m.next) {
-            final int index = find(order, m.size(), m.s1, m.s2, m.s3, m.s4, m.s5, m.s6, m.s7, m.s8);
+            final int index = m.find(order, m.size());
             if (index >= 0) {
                 return true;
             }
@@ -112,19 +112,19 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
     @Override
     public int size() {
         return 32
+                - Long.numberOfLeadingZeros(s0) / 16
                 - Long.numberOfLeadingZeros(s1) / 16
                 - Long.numberOfLeadingZeros(s2) / 16
                 - Long.numberOfLeadingZeros(s3) / 16
                 - Long.numberOfLeadingZeros(s4) / 16
                 - Long.numberOfLeadingZeros(s5) / 16
                 - Long.numberOfLeadingZeros(s6) / 16
-                - Long.numberOfLeadingZeros(s7) / 16
-                - Long.numberOfLeadingZeros(s8) / 16;
+                - Long.numberOfLeadingZeros(s7) / 16;
     }
 
     @Override
     public boolean isEmpty() {
-        return s1 == 0 && s2 == 0 && s3 == 0 && s4 == 0 && s5 == 0 && s6 == 0 && s7 == 0 && s8 == 0;
+        return s0 == 0 && s1 == 0 && s2 == 0 && s3 == 0 && s4 == 0 && s5 == 0 && s6 == 0 && s7 == 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -133,7 +133,7 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
     public <VAL extends V> VAL get(@Nonnull Key<? extends D, VAL> key) {
         final int order = key.getOrder();
         for (TypedShort32KeyMap<D, V> m = this; m != null; m = m.next) {
-            final int index = find(order, m.size(), m.s1, m.s2, m.s3, m.s4, m.s5, m.s6, m.s7, m.s8);
+            final int index = m.find(order, m.size());
             if (index >= 0) {
                 return (VAL) m.getValue(index);
             }
@@ -147,14 +147,13 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
         final int order = key.getOrder();
         for (TypedShort32KeyMap<D, V> m = this; ; m = m.next) {
             final int n = m.size();
-            final long v1 = m.s1, v2 = m.s2, v3 = m.s3, v4 = m.s4, v5 = m.s5, v6 = m.s6, v7 = m.s7, v8 = m.s8;
-            final int index = find(order, n, v1, v2, v3, v4, v5, v6, v7, v8);
+            final int index = m.find(order, n);
             if (index >= 0) {
                 return m.setValue(index, key, value);
             } else if (n < 32) {
                 final int pos = -(index + 1);
                 for (int i = n; i > pos; i--) {
-                    m.setValue(i, key(i - 1, v1, v2, v3, v4, v5, v6, v7, v8), m.getValue(i - 1));
+                    m.setValue(i, m.key(i - 1), m.getValue(i - 1));
                 }
                 m.setValue(pos, order, value);
                 return null;
@@ -208,6 +207,36 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
         }
     }
 
+    private void updateState(int index, int key) {
+        final int offset = (index % 4) * 16;
+        switch (index / 4) {
+            case 0:
+                s0 = (s0 & ~(0xFFFFL << offset)) | ((long) key << offset);
+                break;
+            case 1:
+                s1 = (s1 & ~(0xFFFFL << offset)) | ((long) key << offset);
+                break;
+            case 2:
+                s2 = (s2 & ~(0xFFFFL << offset)) | ((long) key << offset);
+                break;
+            case 3:
+                s3 = (s3 & ~(0xFFFFL << offset)) | ((long) key << offset);
+                break;
+            case 4:
+                s4 = (s4 & ~(0xFFFFL << offset)) | ((long) key << offset);
+                break;
+            case 5:
+                s5 = (s5 & ~(0xFFFFL << offset)) | ((long) key << offset);
+                break;
+            case 6:
+                s6 = (s6 & ~(0xFFFFL << offset)) | ((long) key << offset);
+                break;
+            case 7:
+                s7 = (s7 & ~(0xFFFFL << offset)) | ((long) key << offset);
+                break;
+        }
+    }
+
     private void setValue(int index, int key, V value) {
         switch (index) {
             case 0: v0 = value; break;
@@ -249,36 +278,6 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
             default: throw new IndexOutOfBoundsException(Integer.toString(index));
         }
         updateState(index, key);
-    }
-
-    private void updateState(int index, int key) {
-        final int offset = (index % 4) * 16;
-        switch (index / 4) {
-            case 0:
-                s1 = (s1 & ~(0xFFFFL << offset)) | ((long) key << offset);
-                break;
-            case 1:
-                s2 = (s2 & ~(0xFFFFL << offset)) | ((long) key << offset);
-                break;
-            case 2:
-                s3 = (s3 & ~(0xFFFFL << offset)) | ((long) key << offset);
-                break;
-            case 3:
-                s4 = (s4 & ~(0xFFFFL << offset)) | ((long) key << offset);
-                break;
-            case 4:
-                s5 = (s5 & ~(0xFFFFL << offset)) | ((long) key << offset);
-                break;
-            case 5:
-                s6 = (s6 & ~(0xFFFFL << offset)) | ((long) key << offset);
-                break;
-            case 6:
-                s7 = (s7 & ~(0xFFFFL << offset)) | ((long) key << offset);
-                break;
-            case 7:
-                s8 = (s8 & ~(0xFFFFL << offset)) | ((long) key << offset);
-                break;
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -327,37 +326,37 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
         return (VAL) old;
     }
 
-    private static int key(int index, long v1, long v2, long v3, long v4, long v5, long v6, long v7, long v8) {
+    private int key(int index) {
         final int offset = (index % 4) * 16;
         switch (index / 4) {
             case 0:
-                return (int) ((v1 & (0xFFFFL << offset)) >>> offset);
+                return (int) ((s0 & (0xFFFFL << offset)) >>> offset);
             case 1:
-                return (int) ((v2 & (0xFFFFL << offset)) >>> offset);
+                return (int) ((s1 & (0xFFFFL << offset)) >>> offset);
             case 2:
-                return (int) ((v3 & (0xFFFFL << offset)) >>> offset);
+                return (int) ((s2 & (0xFFFFL << offset)) >>> offset);
             case 3:
-                return (int) ((v4 & (0xFFFFL << offset)) >>> offset);
+                return (int) ((s3 & (0xFFFFL << offset)) >>> offset);
             case 4:
-                return (int) ((v5 & (0xFFFFL << offset)) >>> offset);
+                return (int) ((s4 & (0xFFFFL << offset)) >>> offset);
             case 5:
-                return (int) ((v6 & (0xFFFFL << offset)) >>> offset);
+                return (int) ((s5 & (0xFFFFL << offset)) >>> offset);
             case 6:
-                return (int) ((v7 & (0xFFFFL << offset)) >>> offset);
+                return (int) ((s6 & (0xFFFFL << offset)) >>> offset);
             case 7:
-                return (int) ((v8 & (0xFFFFL << offset)) >>> offset);
+                return (int) ((s7 & (0xFFFFL << offset)) >>> offset);
             default:
                 throw new IllegalArgumentException(Integer.toString(index));
         }
     }
 
-    private static int find(int key, int size, long v1, long v2, long v3, long v4, long v5, long v6, long v7, long v8) {
+    private int find(int key, int size) {
         int low = 0;
         int high = size - 1;
 
         while (low <= high) {
             final int mid = (low + high) >>> 1;
-            final int midVal = key(mid, v1, v2, v3, v4, v5, v6, v7, v8);
+            final int midVal = key(mid);
 
             if (midVal < key) low = mid + 1;
             else if (midVal > key) high = mid - 1;

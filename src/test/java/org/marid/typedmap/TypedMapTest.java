@@ -114,5 +114,7 @@ public class TypedMapTest {
                 x.printStackTrace();
             }
         }
+
+        assertEquals(map.size(), 0);
     }
 }

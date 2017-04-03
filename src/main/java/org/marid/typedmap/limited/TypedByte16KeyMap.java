@@ -62,7 +62,7 @@ public class TypedByte16KeyMap<D extends KeyDomain, V> implements TypedMutableMa
     public boolean containsKey(@Nonnull Key<? extends D, V> key) {
         final int order = key.getOrder();
         for (TypedByte16KeyMap<D, V> m = this; m != null; m = m.next) {
-            final int index = find(order, m.s1, m.s2, m.size());
+            final int index = m.find(order, m.size());
             if (index >= 0) {
                 return true;
             }
@@ -86,7 +86,7 @@ public class TypedByte16KeyMap<D extends KeyDomain, V> implements TypedMutableMa
     public <VAL extends V> VAL get(@Nonnull Key<? extends D, VAL> key) {
         final int order = key.getOrder();
         for (TypedByte16KeyMap<D, V> m = this; m != null; m = m.next) {
-            final int index = find(order, m.s1, m.s2, m.size());
+            final int index = m.find(order, m.size());
             if (index >= 0) {
                 return (VAL) m.getValue(index);
             }
@@ -100,14 +100,13 @@ public class TypedByte16KeyMap<D extends KeyDomain, V> implements TypedMutableMa
         final int order = key.getOrder();
         for (TypedByte16KeyMap<D, V> m = this; ; m = m.next) {
             final int n = m.size();
-            final long v1 = m.s1, v2 = m.s2;
-            final int index = find(order, v1, v2, n);
+            final int index = m.find(order, n);
             if (index >= 0) {
                 return m.setValue(index, key, value);
             } else if (n < 16) {
                 final int pos = -(index + 1);
                 for (int i = n; i > pos; i--) {
-                    m.setValue(i, key(v1, v2, i - 1), m.getValue(i - 1));
+                    m.setValue(i, m.key(i - 1), m.getValue(i - 1));
                 }
                 m.setValue(pos, order, value);
                 return null;
@@ -200,23 +199,23 @@ public class TypedByte16KeyMap<D extends KeyDomain, V> implements TypedMutableMa
         return (VAL) old;
     }
 
-    private static int key(long v1, long v2, int index) {
+    private int key(int index) {
         if (index < 8) {
             final int offset = 8 * index;
-            return (int) ((v1 & (0xFFL << offset)) >>> offset);
+            return (int) ((s1 & (0xFFL << offset)) >>> offset);
         } else {
             final int offset = 8 * (index - 8);
-            return (int) ((v2 & (0xFFL << offset)) >>> offset);
+            return (int) ((s2 & (0xFFL << offset)) >>> offset);
         }
     }
 
-    private static int find(int key, long v1, long v2, int size) {
+    private int find(int key, int size) {
         int low = 0;
         int high = size - 1;
 
         while (low <= high) {
             final int mid = (low + high) >>> 1;
-            final int midVal = key(v1, v2, mid);
+            final int midVal = key(mid);
 
             if (midVal < key) low = mid + 1;
             else if (midVal > key) high = mid - 1;

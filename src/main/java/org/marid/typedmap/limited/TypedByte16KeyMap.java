@@ -64,7 +64,7 @@ public class TypedByte16KeyMap<D extends KeyDomain, V> implements TypedMutableMa
     public boolean containsKey(@Nonnull Key<? extends D, V> key) {
         final int order = key.getOrder();
         for (TypedByte16KeyMap<D, V> m = this; m != null; m = m.next) {
-            final int index = find(order, m.size(), m::key);
+            final int index = find(m::key, order, m.size());
             if (index >= 0) {
                 return true;
             }
@@ -88,7 +88,7 @@ public class TypedByte16KeyMap<D extends KeyDomain, V> implements TypedMutableMa
     public <VAL extends V> VAL get(@Nonnull Key<? extends D, VAL> key) {
         final int order = key.getOrder();
         for (TypedByte16KeyMap<D, V> m = this; m != null; m = m.next) {
-            final int index = find(order, m.size(), m::key);
+            final int index = find(m::key, order, m.size());
             if (index >= 0) {
                 return (VAL) m.getValue(index);
             }
@@ -106,7 +106,7 @@ public class TypedByte16KeyMap<D extends KeyDomain, V> implements TypedMutableMa
     private V put0(int key, @Nonnull V value) {
         for (TypedByte16KeyMap<D, V> m = this; ; m = m.next) {
             final int n = m.size();
-            final int index = find(key, n, m::key);
+            final int index = find(m::key, key, n);
             if (index >= 0) {
                 return m.getAndSet(index, key, value);
             } else if (n < 16) {
@@ -126,7 +126,7 @@ public class TypedByte16KeyMap<D extends KeyDomain, V> implements TypedMutableMa
     private V remove(int key) {
         for (TypedByte16KeyMap<D, V> p = null, m = this; m != null; p = m, m = m.next) {
             final int n = m.size();
-            final int index = find(key, n, m::key);
+            final int index = find(m::key, key, n);
             if (index >= 0) {
                 final V old = m.getValue(index);
                 for (int i = index + 1; i < n; i++) {
@@ -240,11 +240,9 @@ public class TypedByte16KeyMap<D extends KeyDomain, V> implements TypedMutableMa
 
     private int key(int index) {
         if (index < 8) {
-            final int offset = 8 * index;
-            return (int) ((s1 & (0xFFL << offset)) >>> offset);
+            return (int) ((s1 >>> 8 * index) & 0xFFL);
         } else {
-            final int offset = 8 * (index - 8);
-            return (int) ((s2 & (0xFFL << offset)) >>> offset);
+            return (int) ((s2 >>> 8 * index) & 0xFFL);
         }
     }
 }

@@ -88,7 +88,7 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
     public boolean containsKey(@Nonnull Key<? extends D, V> key) {
         final int order = key.getOrder();
         for (TypedShort32KeyMap<D, V> m = this; m != null; m = m.next) {
-            final int index = find(order, m.size(), m::key);
+            final int index = find(m::key, order, m.size());
             if (index >= 0) {
                 return true;
             }
@@ -120,7 +120,7 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
     public <VAL extends V> VAL get(@Nonnull Key<? extends D, VAL> key) {
         final int order = key.getOrder();
         for (TypedShort32KeyMap<D, V> m = this; m != null; m = m.next) {
-            final int index = find(order, m.size(), m::key);
+            final int index = find(m::key, order, m.size());
             if (index >= 0) {
                 return (VAL) m.getValue(index);
             }
@@ -138,7 +138,7 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
     private V put0(int key, @Nonnull V value) {
         for (TypedShort32KeyMap<D, V> m = this; ; m = m.next) {
             final int n = m.size();
-            final int index = find(key, n, m::key);
+            final int index = find(m::key, key, n);
             if (index >= 0) {
                 return m.getAndSet(index, key, value);
             } else if (n < 32) {
@@ -158,7 +158,7 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
     private V remove(int key) {
         for (TypedShort32KeyMap<D, V> p = null, m = this; m != null; p = m, m = m.next) {
             final int n = m.size();
-            final int index = find(key, n, m::key);
+            final int index = find(m::key, key, n);
             if (index >= 0) {
                 final V old = m.getValue(index);
                 for (int i = index + 1; i < n; i++) {
@@ -335,14 +335,14 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
     private int key(int index) {
         final int offset = (index % 4) * 16;
         switch (index / 4) {
-            case 0: return (int) ((s0 & (0xFFFFL << offset)) >>> offset);
-            case 1: return (int) ((s1 & (0xFFFFL << offset)) >>> offset);
-            case 2: return (int) ((s2 & (0xFFFFL << offset)) >>> offset);
-            case 3: return (int) ((s3 & (0xFFFFL << offset)) >>> offset);
-            case 4: return (int) ((s4 & (0xFFFFL << offset)) >>> offset);
-            case 5: return (int) ((s5 & (0xFFFFL << offset)) >>> offset);
-            case 6: return (int) ((s6 & (0xFFFFL << offset)) >>> offset);
-            case 7: return (int) ((s7 & (0xFFFFL << offset)) >>> offset);
+            case 0: return (int) ((s0 >>> offset) & 0xFFFL);
+            case 1: return (int) ((s1 >>> offset) & 0xFFFL);
+            case 2: return (int) ((s2 >>> offset) & 0xFFFL);
+            case 3: return (int) ((s3 >>> offset) & 0xFFFL);
+            case 4: return (int) ((s4 >>> offset) & 0xFFFL);
+            case 5: return (int) ((s5 >>> offset) & 0xFFFL);
+            case 6: return (int) ((s6 >>> offset) & 0xFFFL);
+            case 7: return (int) ((s7 >>> offset) & 0xFFFL);
             default: throw new IllegalArgumentException(Integer.toString(index));
         }
     }

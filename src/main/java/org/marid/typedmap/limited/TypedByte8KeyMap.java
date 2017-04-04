@@ -53,7 +53,7 @@ public class TypedByte8KeyMap<D extends KeyDomain, V> implements TypedMutableMap
     public boolean containsKey(@Nonnull Key<? extends D, V> key) {
         final int order = key.getOrder();
         for (TypedByte8KeyMap<D, V> m = this; m != null; m = m.next) {
-            final int index = find(order, m.size(), m::key);
+            final int index = find(m::key, order, m.size());
             if (index >= 0) {
                 return true;
             }
@@ -77,7 +77,7 @@ public class TypedByte8KeyMap<D extends KeyDomain, V> implements TypedMutableMap
     public <VAL extends V> VAL get(@Nonnull Key<? extends D, VAL> key) {
         final int order = key.getOrder();
         for (TypedByte8KeyMap<D, V> m = this; m != null; m = m.next) {
-            final int index = find(order, m.size(), m::key);
+            final int index = find(m::key, order, m.size());
             if (index >= 0) {
                 return (VAL) m.getValue(index);
             }
@@ -95,7 +95,7 @@ public class TypedByte8KeyMap<D extends KeyDomain, V> implements TypedMutableMap
     private V put0(int key, @Nonnull V value) {
         for (TypedByte8KeyMap<D, V> m = this; ; m = m.next) {
             final int n = m.size();
-            final int index = find(key, n, m::key);
+            final int index = find(m::key, key, n);
             if (index >= 0) {
                 return m.getAndSet(index, key, value);
             } else if (n < 8) {
@@ -115,7 +115,7 @@ public class TypedByte8KeyMap<D extends KeyDomain, V> implements TypedMutableMap
     private V remove(int key) {
         for (TypedByte8KeyMap<D, V> p = null, m = this; m != null; p = m, m = m.next) {
             final int n = m.size();
-            final int index = find(key, n, m::key);
+            final int index = find(m::key, key, n);
             if (index >= 0) {
                 final V old = m.getValue(index);
                 for (int i = index + 1; i < n; i++) {
@@ -199,11 +199,10 @@ public class TypedByte8KeyMap<D extends KeyDomain, V> implements TypedMutableMap
     }
 
     private int key(int index) {
-        final int offset = 8 * index;
-        return (int) ((state & (0xFFL << offset)) >>> offset);
+        return (int) ((state >>> 8 * index) & 0xFFL);
     }
 
-    static int find(int key, int size, IntUnaryOperator keyOp) {
+    static int find(IntUnaryOperator keyOp, int key, int size) {
         int low = 0;
         int high = size - 1;
 

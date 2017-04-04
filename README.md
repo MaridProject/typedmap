@@ -1,6 +1,6 @@
 # Use cases
 
-## As a replacement for sparsed classes with a high probability of not fillings of the most of the fields
+## As a replacement for sparsed classes with a high probability of uninitialized fields 
 
 ## As a replacement for EnumMap with typed keys
 

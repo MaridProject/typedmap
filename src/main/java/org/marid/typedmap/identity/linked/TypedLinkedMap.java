@@ -31,6 +31,19 @@ public class TypedLinkedMap<D extends KeyDomain, V> implements TypedMutableMap<D
     Key<? extends D, ? extends V> key;
     V value;
 
+    public TypedLinkedMap() {
+    }
+
+    public TypedLinkedMap(Key<? extends D, ? extends V> key, V value) {
+        this.key = key;
+        this.value = value;
+    }
+
+    private TypedLinkedMap(Key<? extends D, ? extends V> key, V value, TypedLinkedMap<D, V> next) {
+        this(key, value);
+        this.next = next;
+    }
+
     @Override
     public boolean containsKey(@Nonnull Key<? extends D, V> key) {
         if (this.key == null) {
@@ -84,10 +97,7 @@ public class TypedLinkedMap<D extends KeyDomain, V> implements TypedMutableMap<D
             this.value = value;
             return null;
         } else if (this.key.getOrder() > key.getOrder()) {
-            final TypedLinkedMap<D, V> map = new TypedLinkedMap<>();
-            map.key = this.key;
-            map.value = this.value;
-            map.next = this.next;
+            final TypedLinkedMap<D, V> map = new TypedLinkedMap<>(this.key, this.value, this.next);
             this.key = key;
             this.value = value;
             this.next = map;
@@ -99,17 +109,10 @@ public class TypedLinkedMap<D extends KeyDomain, V> implements TypedMutableMap<D
                     m.value = value;
                     return old;
                 } else if (m.next == null) {
-                    final TypedLinkedMap<D, V> map = new TypedLinkedMap<>();
-                    map.key = key;
-                    map.value = value;
-                    m.next = map;
+                    m.next = new TypedLinkedMap<>(key, value);
                     return null;
                 } else if (m.next.key.getOrder() > key.getOrder()) {
-                    final TypedLinkedMap<D, V> map = new TypedLinkedMap<>();
-                    map.key = key;
-                    map.value = value;
-                    map.next = m.next;
-                    m.next = map;
+                    m.next = new TypedLinkedMap<>(key, value, m.next);
                     return null;
                 }
             }

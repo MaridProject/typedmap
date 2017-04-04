@@ -1,3 +1,11 @@
+# Use cases
+
+## As a replacement for sparsed classes with a high probability of not fillings of the most of the fields
+
+## As a replacement for EnumMap with typed keys
+
+## As a type-safe and memory efficient replacement for Int2ObjectMap/IntObjectMap with domain keys
+
 # Performance characteristics
 
 | Map                           | size | get, ns/op | put, ns/op | put GC alloc.rate, B/op | put GC time, ms |

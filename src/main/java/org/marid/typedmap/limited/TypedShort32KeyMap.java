@@ -22,6 +22,8 @@ import org.marid.typedmap.TypedMutableMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static org.marid.typedmap.limited.TypedByte8KeyMap.find;
+
 /**
  * @author Dmitry Ovchinnikov
  */
@@ -86,7 +88,7 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
     public boolean containsKey(@Nonnull Key<? extends D, V> key) {
         final int order = key.getOrder();
         for (TypedShort32KeyMap<D, V> m = this; m != null; m = m.next) {
-            final int index = m.find(order, m.size());
+            final int index = find(order, m.size(), m::key);
             if (index >= 0) {
                 return true;
             }
@@ -118,7 +120,7 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
     public <VAL extends V> VAL get(@Nonnull Key<? extends D, VAL> key) {
         final int order = key.getOrder();
         for (TypedShort32KeyMap<D, V> m = this; m != null; m = m.next) {
-            final int index = m.find(order, m.size());
+            final int index = find(order, m.size(), m::key);
             if (index >= 0) {
                 return (VAL) m.getValue(index);
             }
@@ -136,7 +138,7 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
     private V put0(int key, @Nonnull V value) {
         for (TypedShort32KeyMap<D, V> m = this; ; m = m.next) {
             final int n = m.size();
-            final int index = m.find(key, n);
+            final int index = find(key, n, m::key);
             if (index >= 0) {
                 return m.getAndSet(index, key, value);
             } else if (n < 32) {
@@ -156,7 +158,7 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
     private V remove(int key) {
         for (TypedShort32KeyMap<D, V> p = null, m = this; m != null; p = m, m = m.next) {
             final int n = m.size();
-            final int index = m.find(key, n);
+            final int index = find(key, n, m::key);
             if (index >= 0) {
                 final V old = m.getValue(index);
                 for (int i = index + 1; i < n; i++) {
@@ -343,20 +345,5 @@ public class TypedShort32KeyMap<D extends KeyDomain, V> implements TypedMutableM
             case 7: return (int) ((s7 & (0xFFFFL << offset)) >>> offset);
             default: throw new IllegalArgumentException(Integer.toString(index));
         }
-    }
-
-    private int find(int key, int size) {
-        int low = 0;
-        int high = size - 1;
-
-        while (low <= high) {
-            final int mid = (low + high) >>> 1;
-            final int midVal = key(mid);
-
-            if (midVal < key) low = mid + 1;
-            else if (midVal > key) high = mid - 1;
-            else return mid;
-        }
-        return -(low + 1);
     }
 }

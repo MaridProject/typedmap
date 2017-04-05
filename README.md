@@ -1,3 +1,35 @@
+# Usage
+
+## Create interfaces for key domains
+
+```java
+public interface MyCommonKeyDomain extends KeyDomain {
+}
+```
+
+```java
+public interface MyKeyDomain1 extends MyCommonKeyDomain {
+
+    Key<MyKeyDomain1, Integer> KEY1 = new Key<>(MyKeyDomain1.class, () -> 0);
+    Key<MyKeyDomain1, Long> KEY2 = new Key<>(MyKeyDomain1.class, () -> 0L);
+    // ...
+}
+```
+
+```java
+public interface MyKeyDomain2 extends MyCommonKeyDomain {
+
+   Key<MyKeyDomain1, BigDecimal> KEY3 = new Key<>(MyKeyDomain2.class, () -> BigDecimal.ZERO);
+   // ...
+}
+```
+
+```java
+TypedByte8KeyMap<MyCommonKeyDomain, Number> map = new TypedByte8KeyMap<>();
+map.put(KEY1, 8); // you can put only Integer instances for KEY1
+map.put(KEY3, BigDecimal.ONE);
+```
+
 # Use cases
 
 ## As a replacement for sparsed data structures with a high probability of uninitialized fields 

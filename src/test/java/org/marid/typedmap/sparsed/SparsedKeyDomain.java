@@ -33,7 +33,7 @@ public interface SparsedKeyDomain extends KeyDomain {
 
     Map<Class<?>, Supplier<?>> RANDOM_SUPPLIER_MAP = new HashMap<>();
 
-    List<Field> FIELDS = Stream.of(ExampleSparsedStruct.class.getFields())
+    List<Field> FIELDS = Stream.of(SparsedStruct.class.getFields())
             .peek(f -> f.setAccessible(true))
             .collect(toList());
 

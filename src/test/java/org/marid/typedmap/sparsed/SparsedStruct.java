@@ -21,7 +21,7 @@ import java.math.BigInteger;
 /**
  * @author Dmitry Ovchinnikov
  */
-public class ExampleSparsedStruct {
+public class SparsedStruct {
 
     public BigDecimal f0;
     public BigInteger f1;

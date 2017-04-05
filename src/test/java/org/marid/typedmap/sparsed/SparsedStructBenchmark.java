@@ -40,13 +40,13 @@ import static org.marid.typedmap.sparsed.RandomSuppliers.RANDOM_SUPPLIERS;
 @OperationsPerInvocation(10_000)
 @Threads(Threads.MAX)
 @Fork(value = 1, jvmArgs = {"-XX:+UseG1GC"})
-public class ExampleSparsedStructBenchmark {
+public class SparsedStructBenchmark {
 
     private static final float FILL = 0.125f;
 
     @Benchmark
-    public ExampleSparsedStruct pojo(ThreadState state) throws Exception {
-        final ExampleSparsedStruct pojo = new ExampleSparsedStruct();
+    public SparsedStruct pojo(ThreadState state) throws Exception {
+        final SparsedStruct pojo = new SparsedStruct();
         final int k = state.random.nextInt(state.keys.length);
         for (int i = 0; i < state.size; i++) {
             final Field field = state.keys[k][i].field;
@@ -109,7 +109,7 @@ public class ExampleSparsedStructBenchmark {
 
     public static void main(String... args) throws Exception {
         new Runner(new OptionsBuilder()
-                .include(ExampleSparsedStructBenchmark.class.getSimpleName())
+                .include(SparsedStructBenchmark.class.getSimpleName())
                 .addProfiler(GCProfiler.class)
                 .shouldDoGC(true)
                 .build()

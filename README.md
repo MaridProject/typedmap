@@ -97,6 +97,14 @@ public enum MyEnum implements Interface<T> {
 in enums.
 
 This project uses typed keys. Each key may belong to a key domain (an interface that extends base KeyDomain interface). Once created, the key receives an unique id within the most common KeyDomain interface. Some typed maps use these ids to sort entries to speed-up lookup and put operations.
+The most convenient way to create static final typed key instances is to declare them in interfaces, e.g.
+```java
+public interface MyKeys {
+
+   Key<MyDomain, String> KEY1 = new Key<>(MyDomain.class, () -> "default value");
+   Key<MyDomain, Currency> KEY2 = new Key<>(MyDomain.class, () -> Currency.getInstance("BYN"));
+}
+```
 
 ## As a type-safe and memory efficient replacement for Int2ObjectMap/IntObjectMap with domain keys
 

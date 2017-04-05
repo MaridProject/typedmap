@@ -13,23 +13,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap.examples;
+package org.marid.typedmap.sparsed;
 
-import org.marid.typedmap.Key;
-import org.marid.typedmap.KeyDomain;
+import org.marid.typedmap.examples.SampleKey;
 
-import java.util.function.Supplier;
+import java.lang.reflect.Field;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-public class SampleKey<D extends KeyDomain, V> extends Key<D, V> {
+public class SparsedKey extends SampleKey<SparsedKeyDomain, Object> {
 
-    public SampleKey(Class<D> domain, Supplier<? extends V> defaultValueSupplier) {
-        super(domain, defaultValueSupplier);
-    }
+    public final Field field;
 
-    public SampleKey(Class<D> domain) {
-        this(domain, () -> null);
+    public SparsedKey(Field field) {
+        super(SparsedKeyDomain.class);
+        this.field = field;
+        field.setAccessible(true);
     }
 }

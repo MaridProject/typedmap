@@ -13,23 +13,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.marid.typedmap.examples;
+package org.marid.typedmap.sparsed;
 
-import org.marid.typedmap.Key;
 import org.marid.typedmap.KeyDomain;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-public class SampleKey<D extends KeyDomain, V> extends Key<D, V> {
+public interface SparsedKeyDomain extends KeyDomain {
 
-    public SampleKey(Class<D> domain, Supplier<? extends V> defaultValueSupplier) {
-        super(domain, defaultValueSupplier);
-    }
+    Map<Class<?>, Supplier<?>> RANDOM_SUPPLIER_MAP = new HashMap<>();
 
-    public SampleKey(Class<D> domain) {
-        this(domain, () -> null);
-    }
+    List<Field> FIELDS = Stream.of(ExampleSparsedStruct.class.getFields())
+            .peek(f -> f.setAccessible(true))
+            .collect(toList());
+
+    List<SparsedKey> KEYS = FIELDS.stream().map(SparsedKey::new).collect(toList());
 }

@@ -2,7 +2,7 @@
 
 ## As a replacement for sparsed data structures with a high probability of uninitialized fields 
 
-Suppose we have a data class (see [SparsedStruct.java](https://github.com/MaridProject/typedmap/blob/master/src/test/java/org/marid/typedmap/sparsed/SparsedStruct.java) of 128 fields. But only 10-15% of the fields are populated with non-null values.
+Suppose we have a data class (see [SparsedStruct.java](https://github.com/MaridProject/typedmap/blob/master/src/test/java/org/marid/typedmap/sparsed/SparsedStruct.java)) of 128 fields. But only 10-15% of the fields are populated with non-null values.
 
 So, instead of using this awful data structure you can use hashmap-like typed structure that let you code with static typing but with increased performance and reduced memory consumption.
 

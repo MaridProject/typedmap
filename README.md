@@ -84,7 +84,7 @@ SparsedStructBenchmark.pojo:·gc.time                        thrpt    5       89
 
 ## As a replacement for EnumMap with typed keys
 
-As you know, Enums have an important limitation not allowing to use typed instance. You cannot do something like that in Enum:��
+As you know, java enums have an important limitation not allowing to use typed instances. You cannot do something like that
 
 ```java
 public enum MyEnum implements Interface<T> {
@@ -94,6 +94,7 @@ public enum MyEnum implements Interface<T> {
    // ...
 }
 ```
+in enums.
 
 ## As a type-safe and memory efficient replacement for Int2ObjectMap/IntObjectMap with domain keys
 

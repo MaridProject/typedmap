@@ -9,43 +9,43 @@ So, instead of using this awful data structure you can use hashmap-like typed st
 Let's compare these approaches:
 
 ```
-Benchmark                                                           Mode  Cnt        Score        Error   Units
-ExampleSparsedStructBenchmark.byte16                               thrpt    5  4126117.531 ±  47377.163   ops/s
-ExampleSparsedStructBenchmark.byte16:·gc.alloc.rate                thrpt    5      251.642 ±      2.538  MB/sec
-ExampleSparsedStructBenchmark.byte16:·gc.alloc.rate.norm           thrpt    5       96.001 ±      0.001    B/op
-ExampleSparsedStructBenchmark.byte16:·gc.churn.G1_Eden_Space       thrpt    5       93.052 ±      6.831  MB/sec
-ExampleSparsedStructBenchmark.byte16:·gc.churn.G1_Eden_Space.norm  thrpt    5       35.500 ±      2.840    B/op
-ExampleSparsedStructBenchmark.byte16:·gc.churn.G1_Old_Gen          thrpt    5        0.653 ±      0.009  MB/sec
-ExampleSparsedStructBenchmark.byte16:·gc.churn.G1_Old_Gen.norm     thrpt    5        0.249 ±      0.005    B/op
-ExampleSparsedStructBenchmark.byte16:·gc.count                     thrpt    5        5.000               counts
-ExampleSparsedStructBenchmark.byte16:·gc.time                      thrpt    5       14.000                   ms
-ExampleSparsedStructBenchmark.byte8                                thrpt    5  6145184.046 ± 179173.952   ops/s
-ExampleSparsedStructBenchmark.byte8:·gc.alloc.rate                 thrpt    5      436.792 ±     13.154  MB/sec
-ExampleSparsedStructBenchmark.byte8:·gc.alloc.rate.norm            thrpt    5      112.001 ±      0.001    B/op
-ExampleSparsedStructBenchmark.byte8:·gc.churn.G1_Eden_Space        thrpt    5      292.861 ±     10.199  MB/sec
-ExampleSparsedStructBenchmark.byte8:·gc.churn.G1_Eden_Space.norm   thrpt    5       75.100 ±      4.322    B/op
-ExampleSparsedStructBenchmark.byte8:·gc.churn.G1_Old_Gen           thrpt    5        0.652 ±      0.010  MB/sec
-ExampleSparsedStructBenchmark.byte8:·gc.churn.G1_Old_Gen.norm      thrpt    5        0.167 ±      0.007    B/op
-ExampleSparsedStructBenchmark.byte8:·gc.count                      thrpt    5       10.000               counts
-ExampleSparsedStructBenchmark.byte8:·gc.time                       thrpt    5       36.000                   ms
-ExampleSparsedStructBenchmark.linked                               thrpt    5  6326925.220 ± 376948.722   ops/s
-ExampleSparsedStructBenchmark.linked:·gc.alloc.rate                thrpt    5     1546.872 ±     97.953  MB/sec
-ExampleSparsedStructBenchmark.linked:·gc.alloc.rate.norm           thrpt    5      384.001 ±      0.001    B/op
-ExampleSparsedStructBenchmark.linked:·gc.churn.G1_Eden_Space       thrpt    5     1323.210 ±     11.094  MB/sec
-ExampleSparsedStructBenchmark.linked:·gc.churn.G1_Eden_Space.norm  thrpt    5      328.557 ±     23.219    B/op
-ExampleSparsedStructBenchmark.linked:·gc.churn.G1_Old_Gen          thrpt    5        0.655 ±      0.006  MB/sec
-ExampleSparsedStructBenchmark.linked:·gc.churn.G1_Old_Gen.norm     thrpt    5        0.163 ±      0.011    B/op
-ExampleSparsedStructBenchmark.linked:·gc.count                     thrpt    5       20.000               counts
-ExampleSparsedStructBenchmark.linked:·gc.time                      thrpt    5      102.000                   ms
-ExampleSparsedStructBenchmark.pojo                                 thrpt    5  3850679.239 ± 994075.330   ops/s
-ExampleSparsedStructBenchmark.pojo:·gc.alloc.rate                  thrpt    5     1294.028 ±    343.558  MB/sec
-ExampleSparsedStructBenchmark.pojo:·gc.alloc.rate.norm             thrpt    5      528.001 ±      0.001    B/op
-ExampleSparsedStructBenchmark.pojo:·gc.churn.G1_Eden_Space         thrpt    5      939.611 ±   1327.491  MB/sec
-ExampleSparsedStructBenchmark.pojo:·gc.churn.G1_Eden_Space.norm    thrpt    5      378.168 ±    446.745    B/op
-ExampleSparsedStructBenchmark.pojo:·gc.churn.G1_Old_Gen            thrpt    5        0.654 ±      0.003  MB/sec
-ExampleSparsedStructBenchmark.pojo:·gc.churn.G1_Old_Gen.norm       thrpt    5        0.268 ±      0.071    B/op
-ExampleSparsedStructBenchmark.pojo:·gc.count                       thrpt    5       17.000               counts
-ExampleSparsedStructBenchmark.pojo:·gc.time                        thrpt    5       78.000                   ms
+Benchmark                                                    Mode  Cnt        Score         Error   Units
+SparsedStructBenchmark.byte16                               thrpt    5  3928450.037 ±  100597.093   ops/s
+SparsedStructBenchmark.byte16:·gc.alloc.rate                thrpt    5      239.424 ±       5.997  MB/sec
+SparsedStructBenchmark.byte16:·gc.alloc.rate.norm           thrpt    5       96.001 ±       0.001    B/op
+SparsedStructBenchmark.byte16:·gc.churn.G1_Eden_Space       thrpt    5      103.488 ±      87.770  MB/sec
+SparsedStructBenchmark.byte16:·gc.churn.G1_Eden_Space.norm  thrpt    5       41.529 ±      36.146    B/op
+SparsedStructBenchmark.byte16:·gc.churn.G1_Old_Gen          thrpt    5        0.651 ±       0.023  MB/sec
+SparsedStructBenchmark.byte16:·gc.churn.G1_Old_Gen.norm     thrpt    5        0.261 ±       0.013    B/op
+SparsedStructBenchmark.byte16:·gc.count                     thrpt    5        6.000                counts
+SparsedStructBenchmark.byte16:·gc.time                      thrpt    5       24.000                    ms
+SparsedStructBenchmark.byte8                                thrpt    5  5116186.063 ±  157104.708   ops/s
+SparsedStructBenchmark.byte8:·gc.alloc.rate                 thrpt    5      363.745 ±      12.946  MB/sec
+SparsedStructBenchmark.byte8:·gc.alloc.rate.norm            thrpt    5      112.001 ±       0.001    B/op
+SparsedStructBenchmark.byte8:·gc.churn.G1_Eden_Space        thrpt    5      292.694 ±       2.673  MB/sec
+SparsedStructBenchmark.byte8:·gc.churn.G1_Eden_Space.norm   thrpt    5       90.131 ±       3.831    B/op
+SparsedStructBenchmark.byte8:·gc.churn.G1_Old_Gen           thrpt    5        0.653 ±       0.006  MB/sec
+SparsedStructBenchmark.byte8:·gc.churn.G1_Old_Gen.norm      thrpt    5        0.201 ±       0.006    B/op
+SparsedStructBenchmark.byte8:·gc.count                      thrpt    5       10.000                counts
+SparsedStructBenchmark.byte8:·gc.time                       thrpt    5       39.000                    ms
+SparsedStructBenchmark.linked                               thrpt    5  6298741.392 ±  234602.431   ops/s
+SparsedStructBenchmark.linked:·gc.alloc.rate                thrpt    5     1536.016 ±      45.973  MB/sec
+SparsedStructBenchmark.linked:·gc.alloc.rate.norm           thrpt    5      384.001 ±       0.001    B/op
+SparsedStructBenchmark.linked:·gc.churn.G1_Eden_Space       thrpt    5     1317.853 ±      11.009  MB/sec
+SparsedStructBenchmark.linked:·gc.churn.G1_Eden_Space.norm  thrpt    5      329.475 ±       9.633    B/op
+SparsedStructBenchmark.linked:·gc.churn.G1_Old_Gen          thrpt    5        0.652 ±       0.008  MB/sec
+SparsedStructBenchmark.linked:·gc.churn.G1_Old_Gen.norm     thrpt    5        0.163 ±       0.005    B/op
+SparsedStructBenchmark.linked:·gc.count                     thrpt    5       20.000                counts
+SparsedStructBenchmark.linked:·gc.time                      thrpt    5      103.000                    ms
+SparsedStructBenchmark.pojo                                 thrpt    5  3679792.900 ± 1193894.983   ops/s
+SparsedStructBenchmark.pojo:·gc.alloc.rate                  thrpt    5     1241.953 ±     409.663  MB/sec
+SparsedStructBenchmark.pojo:·gc.alloc.rate.norm             thrpt    5      528.001 ±       0.001    B/op
+SparsedStructBenchmark.pojo:·gc.churn.G1_Eden_Space         thrpt    5     1057.805 ±    1307.181  MB/sec
+SparsedStructBenchmark.pojo:·gc.churn.G1_Eden_Space.norm    thrpt    5      443.198 ±     438.197    B/op
+SparsedStructBenchmark.pojo:·gc.churn.G1_Old_Gen            thrpt    5        0.651 ±       0.013  MB/sec
+SparsedStructBenchmark.pojo:·gc.churn.G1_Old_Gen.norm       thrpt    5        0.278 ±       0.103    B/op
+SparsedStructBenchmark.pojo:·gc.count                       thrpt    5       18.000                counts
+SparsedStructBenchmark.pojo:·gc.time                        thrpt    5       89.000                    ms
 ```
 
 ## As a replacement for EnumMap with typed keys

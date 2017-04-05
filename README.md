@@ -24,6 +24,8 @@ public interface MyKeyDomain2 extends MyCommonKeyDomain {
 }
 ```
 
+## Create a typed map instance and put values
+
 ```java
 TypedByte8KeyMap<MyCommonKeyDomain, Number> map = new TypedByte8KeyMap<>();
 map.put(KEY1, 8); // you can put only Integer instances for KEY1

@@ -87,9 +87,9 @@ SparsedStructBenchmark.pojo:·gc.time                        thrpt    5       89
 As you know, java enums have an important limitation not allowing to use typed instances. You cannot do something like that
 
 ```java
-public enum MyEnum implements Interface<T> {
+public enum MyEnum implements Interface<T> { // compilation error
 
-   KEY1<Integer>,
+   KEY1<Integer>, // compilation error
    KEY2<Long>
    // ...
 }

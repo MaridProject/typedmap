@@ -1,6 +1,6 @@
 # Usage
 
-## Create interfaces for key domains
+## Create interfaces for key domains and static final key instances
 
 ```java
 public interface MyCommonKeyDomain extends KeyDomain {

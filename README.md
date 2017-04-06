@@ -94,7 +94,7 @@ public enum MyEnum implements Interface<T> { // compilation error
    // ...
 }
 ```
-in enums.
+in enums (this feature can be added to Java 10: see [Enhanced enums](https://www.infoq.com/news/2017/01/java-enhanced-enums)).
 
 This project uses typed keys. Each key may belong to a key domain (an interface that extends base KeyDomain interface). Once created, the key receives an unique id within the most common KeyDomain interface. Some typed maps use these ids to sort entries to speed-up lookup and put operations.
 The most convenient way to create static final typed key instances is to declare them in interfaces, e.g.

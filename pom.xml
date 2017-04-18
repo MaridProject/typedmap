@@ -8,6 +8,8 @@
     <packaging>jar</packaging>
 
     <name>TypedMap implementation</name>
+    <url>https://github.com/MaridProject/typedmap</url>
+    <description>TypedMap implementation (can be used as EnumMap replacement with typed keys)</description>
 
     <developers>
         <developer>
@@ -53,10 +55,6 @@
     </distributionManagement>
 
     <inceptionYear>2017</inceptionYear>
-
-    <prerequisites>
-        <maven>3.3</maven>
-    </prerequisites>
 
     <build>
         <pluginManagement>
